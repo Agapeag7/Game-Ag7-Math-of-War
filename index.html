@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ag7 Math of War - Jeu de tir à la corde mathématique</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Écran d'accueil -->
+        <div id="home-screen" class="screen active">
+            <h1 class="game-title">Ag7 Math of War</h1>
+            
+            <div class="settings-panel">
+                <div class="setting-group">
+                    <label for="difficulty">Niveau de difficulté</label>
+                    <select id="difficulty" class="setting-select">
+                        <option value="1">Niveau 1 : Additions simples (0-10)</option>
+                        <option value="2">Niveau 2 : Additions/Soustractions (0-50)</option>
+                        <option value="3">Niveau 3 : Multiplications simples</option>
+                        <option value="4">Niveau 4 : Divisions simples</option>
+                        <option value="5">Niveau 5 : Mélange de tout</option>
+                        <option value="6">Niveau 6 : Mode chronométré</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label>Mode de jeu</label>
+                    <div class="mode-buttons">
+                        <button id="mode-pvp" class="mode-btn active">Joueur vs Joueur</button>
+                        <button id="mode-pvai" class="mode-btn">Joueur vs IA</button>
+                    </div>
+                </div>
+
+                <button id="start-game" class="start-btn">Commencer la partie</button>
+            </div>
+        </div>
+
+        <!-- Écran de jeu -->
+        <div id="game-screen" class="screen">
+            <!-- En-tête du jeu -->
+            <div class="game-header">
+                <div class="team team1-header">
+                    <div class="team-name">Équipe Rouge</div>
+                    <div class="team-score" id="team1-score">0</div>
+                </div>
+
+                <div class="match-info">
+                    <div class="rounds" id="rounds">Manche 1/3</div>
+                    <div class="timer" id="timer">00:00</div>
+                </div>
+
+                <div class="team team2-header">
+                    <div class="team-name">Équipe Bleue</div>
+                    <div class="team-score" id="team2-score">0</div>
+                </div>
+            </div>
+
+            <!-- Zone de tir à la corde -->
+            <div class="tug-of-war-area">
+                <div class="rope-container">
+                    <div class="rope" id="rope">
+                        <div class="rope-center" id="rope-center">⚡</div>
+                    </div>
+                </div>
+                
+                <div class="teams-indicators">
+                    <div class="team-indicator team1-indicator">🏃</div>
+                    <div class="team-indicator team2-indicator">🏃</div>
+                </div>
+            </div>
+
+            <!-- Zone de jeu principale -->
+            <div class="game-area">
+                <!-- Équipe 1 -->
+                <div class="team-play-area team1-area">
+                    <div class="question-display" id="team1-question">
+                        <span class="operation" id="team1-operation">5 + 3</span>
+                        <span class="equals">=</span>
+                        <span class="answer" id="team1-answer">?</span>
+                    </div>
+                </div>
+
+                <!-- Équipe 2 -->
+                <div class="team-play-area team2-area">
+                    <div class="question-display" id="team2-question">
+                        <span class="operation" id="team2-operation">8 - 2</span>
+                        <span class="equals">=</span>
+                        <span class="answer" id="team2-answer">?</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pavé numérique et contrôles -->
+            <div class="controls-area">
+                <div class="numeric-pad" id="numeric-pad">
+                    <button class="num-btn" data-num="1">1</button>
+                    <button class="num-btn" data-num="2">2</button>
+                    <button class="num-btn" data-num="3">3</button>
+                    <button class="num-btn" data-num="4">4</button>
+                    <button class="num-btn" data-num="5">5</button>
+                    <button class="num-btn" data-num="6">6</button>
+                    <button class="num-btn" data-num="7">7</button>
+                    <button class="num-btn" data-num="8">8</button>
+                    <button class="num-btn" data-num="9">9</button>
+                    <button class="num-btn" data-num="0">0</button>
+                    <button class="action-btn clear-btn" id="clear-btn">Effacer</button>
+                    <button class="action-btn validate-btn" id="validate-btn">Valider</button>
+                </div>
+
+                <div class="game-actions">
+                    <button class="game-action-btn" id="pause-btn">⏸️ Pause</button>
+                    <button class="game-action-btn" id="restart-btn">🔄 Recommencer</button>
+                    <button class="game-action-btn" id="scores-btn">🏆 Scores</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran de pause -->
+        <div id="pause-screen" class="screen">
+            <h2>Jeu en pause</h2>
+            <button id="resume-btn" class="action-btn">Reprendre</button>
+            <button id="quit-to-menu-btn" class="action-btn">Quitter</button>
+        </div>
+
+        <!-- Écran des scores -->
+        <div id="scores-screen" class="screen">
+            <h2>Meilleurs scores</h2>
+            <div id="highscores-list" class="highscores-list"></div>
+            <button id="back-to-menu-from-scores" class="action-btn">Retour</button>
+            <button id="clear-scores" class="action-btn secondary">Effacer les scores</button>
+        </div>
+
+        <!-- Écran de victoire -->
+        <div id="victory-screen" class="screen">
+            <h2 id="victory-message"></h2>
+            <div class="confetti" id="confetti-container"></div>
+            <button id="play-again-btn" class="action-btn">Rejouer</button>
+            <button id="back-to-menu-btn" class="action-btn">Menu principal</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
