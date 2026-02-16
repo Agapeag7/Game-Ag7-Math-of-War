@@ -3,54 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ag7 Math of War - Jeu de tir à la corde mathématique</title>
+    <title>Math Tug of War - Jeu de tir à la corde mathématique</title>
+    
+    <!-- Google Fonts pour une typographie améliorée -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome 6 pour des icônes plus belles (gratuit) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Animate.css pour des animations supplémentaires -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <!-- Hover.css pour des effets de bouton sophistiqués -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css"/>
+    
+    <!-- Votre CSS existant -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        <!-- Écran d'accueil -->
+        <!-- Écran d'accueil amélioré -->
         <div id="home-screen" class="screen active">
-            <h1 class="game-title">Ag7 Math of War</h1>
-            
-            <div class="settings-panel">
-                <div class="setting-group">
-                    <label for="difficulty">Niveau de difficulté</label>
-                    <select id="difficulty" class="setting-select">
-                        <option value="1">Niveau 1 : Additions simples (0-10)</option>
-                        <option value="2">Niveau 2 : Additions/Soustractions (0-50)</option>
-                        <option value="3">Niveau 3 : Multiplications simples</option>
-                        <option value="4">Niveau 4 : Divisions simples</option>
-                        <option value="5">Niveau 5 : Mélange de tout</option>
-                        <option value="6">Niveau 6 : Mode chronométré</option>
-                    </select>
+            <div class="home-content">
+                <!-- Animation de corde décorative -->
+                <div class="home-rope-decoration">
+                    <div class="home-rope"></div>
+                    <div class="home-knot">⚡</div>
+                    <div class="home-team home-team1">🔴</div>
+                    <div class="home-team home-team2">🔵</div>
                 </div>
 
-                <div class="setting-group">
-                    <label>Mode de jeu</label>
-                    <div class="mode-buttons">
-                        <button id="mode-pvp" class="mode-btn active">Joueur vs Joueur</button>
-                        <button id="mode-pvai" class="mode-btn">Joueur vs IA</button>
+                <h1 class="game-title animate__animated animate__bounceIn">
+                    <i class="fas fa-calculator"></i> 
+                    Math Tug of War 
+                    <i class="fas fa-dragon"></i>
+                </h1>
+                
+                <p class="game-subtitle animate__animated animate__fadeInUp">
+                    Le jeu de tir à la corde qui fait travailler les méninges !
+                </p>
+
+                <div class="settings-panel animate__animated animate__fadeInUp animate__delay-1s">
+                    <!-- Sélecteur de difficulté avec icônes -->
+                    <div class="setting-group">
+                        <label><i class="fas fa-chart-line"></i> Niveau de difficulté</label>
+                        <div class="difficulty-cards">
+                            <div class="difficulty-card" data-difficulty="1">
+                                <div class="card-icon">🌱</div>
+                                <div class="card-title">Débutant</div>
+                                <div class="card-desc">Additions 0-10</div>
+                            </div>
+                            <div class="difficulty-card" data-difficulty="2">
+                                <div class="card-icon">🌿</div>
+                                <div class="card-title">Facile</div>
+                                <div class="card-desc">+ et - 0-50</div>
+                            </div>
+                            <div class="difficulty-card" data-difficulty="3">
+                                <div class="card-icon">🌳</div>
+                                <div class="card-title">Intermédiaire</div>
+                                <div class="card-desc">Multiplications</div>
+                            </div>
+                            <div class="difficulty-card" data-difficulty="4">
+                                <div class="card-icon">🏔️</div>
+                                <div class="card-title">Avancé</div>
+                                <div class="card-desc">Divisions</div>
+                            </div>
+                            <div class="difficulty-card" data-difficulty="5">
+                                <div class="card-icon">🌋</div>
+                                <div class="card-title">Expert</div>
+                                <div class="card-desc">Tout mélangé</div>
+                            </div>
+                            <div class="difficulty-card" data-difficulty="6">
+                                <div class="card-icon">⏱️</div>
+                                <div class="card-title">Chronométré</div>
+                                <div class="card-desc">10 secondes</div>
+                            </div>
+                        </div>
+                        <select id="difficulty" class="setting-select" style="display: none;">
+                            <option value="1">Niveau 1 : Additions simples (0-10)</option>
+                            <option value="2">Niveau 2 : Additions/Soustractions (0-50)</option>
+                            <option value="3">Niveau 3 : Multiplications simples</option>
+                            <option value="4">Niveau 4 : Divisions simples</option>
+                            <option value="5">Niveau 5 : Mélange de tout</option>
+                            <option value="6">Niveau 6 : Mode chronométré</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label><i class="fas fa-users"></i> Mode de jeu</label>
+                        <div class="mode-cards">
+                            <div class="mode-card" data-mode="pvp">
+                                <div class="card-icon"><i class="fas fa-user-friends"></i></div>
+                                <div class="card-title">Joueur vs Joueur</div>
+                                <div class="card-desc">Affrontez un ami</div>
+                            </div>
+                            <div class="mode-card" data-mode="pvai">
+                                <div class="card-icon"><i class="fas fa-microchip"></i></div>
+                                <div class="card-title">Joueur vs IA</div>
+                                <div class="card-desc">Défiez l'ordinateur</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="start-game" class="start-btn hvr-float-shadow">
+                        <i class="fas fa-play"></i> Commencer la partie
+                        <span class="btn-shine"></span>
+                    </button>
+                </div>
+
+                <!-- Petit pied de page avec instructions -->
+                <div class="home-footer">
+                    <p><i class="fas fa-lightbulb"></i> Répondez vite pour tirer la corde de votre côté !</p>
+                    <div class="home-stats">
+                        <span><i class="fas fa-trophy"></i> 3 manches pour gagner</span>
+                        <span><i class="fas fa-clock"></i> Chrono selon niveau</span>
                     </div>
                 </div>
-
-                <button id="start-game" class="start-btn">Commencer la partie</button>
             </div>
         </div>
 
         <!-- Écran de jeu -->
         <div id="game-screen" class="screen">
-            <!-- En-tête du jeu -->
             <div class="game-header">
                 <div class="team team1-header">
                     <div class="team-name">Équipe Rouge</div>
                     <div class="team-score" id="team1-score">0</div>
                 </div>
-
                 <div class="match-info">
-                    <div class="rounds" id="rounds">Manche 1/3</div>
-                    <div class="timer" id="timer">00:00</div>
+                    <div id="rounds">Manche 1/3</div>
+                    <div id="timer" class="timer">00:30</div>
                 </div>
-
                 <div class="team team2-header">
                     <div class="team-name">Équipe Bleue</div>
                     <div class="team-score" id="team2-score">0</div>
@@ -60,84 +142,98 @@
             <!-- Zone de tir à la corde -->
             <div class="tug-of-war-area">
                 <div class="rope-container">
-                    <div class="rope" id="rope">
-                        <div class="rope-center" id="rope-center">⚡</div>
-                    </div>
+                    <div class="rope"></div>
+                    <div class="rope-center" id="rope-center">⚡</div>
                 </div>
-                
                 <div class="teams-indicators">
-                    <div class="team-indicator team1-indicator">🏃</div>
-                    <div class="team-indicator team2-indicator">🏃</div>
+                    <div class="team-indicator team1-indicator">🔴</div>
+                    <div class="team-indicator team2-indicator">🔵</div>
                 </div>
             </div>
 
-            <!-- Zone de jeu principale -->
+            <!-- Zones de jeu -->
             <div class="game-area">
-                <!-- Équipe 1 -->
                 <div class="team-play-area team1-area">
-                    <div class="question-display" id="team1-question">
-                        <span class="operation" id="team1-operation">5 + 3</span>
-                        <span class="equals">=</span>
-                        <span class="answer" id="team1-answer">?</span>
-                    </div>
+                    <div class="question-display" id="team1-operation">3 + 2 = <span class="answer" id="team1-answer">?</span></div>
                 </div>
-
-                <!-- Équipe 2 -->
                 <div class="team-play-area team2-area">
-                    <div class="question-display" id="team2-question">
-                        <span class="operation" id="team2-operation">8 - 2</span>
-                        <span class="equals">=</span>
-                        <span class="answer" id="team2-answer">?</span>
-                    </div>
+                    <div class="question-display" id="team2-operation">À ton tour !</div>
                 </div>
             </div>
 
-            <!-- Pavé numérique et contrôles -->
+            <!-- Contrôles -->
             <div class="controls-area">
-                <div class="numeric-pad" id="numeric-pad">
+                <div class="numeric-pad">
                     <button class="num-btn" data-num="1">1</button>
                     <button class="num-btn" data-num="2">2</button>
                     <button class="num-btn" data-num="3">3</button>
+                    <button class="action-btn clear-btn" id="clear-btn"><i class="fas fa-backspace"></i></button>
+                    
                     <button class="num-btn" data-num="4">4</button>
                     <button class="num-btn" data-num="5">5</button>
                     <button class="num-btn" data-num="6">6</button>
+                    <button class="action-btn delete-btn" id="delete-btn"><i class="fas fa-trash"></i></button>
+                    
                     <button class="num-btn" data-num="7">7</button>
                     <button class="num-btn" data-num="8">8</button>
                     <button class="num-btn" data-num="9">9</button>
+                    <button class="action-btn" id="validate-btn" style="grid-column: span 1;"><i class="fas fa-check"></i></button>
+                    
                     <button class="num-btn" data-num="0">0</button>
-                    <button class="action-btn clear-btn" id="clear-btn">Effacer</button>
-                    <button class="action-btn validate-btn" id="validate-btn">Valider</button>
+                    <button class="action-btn" id="validate-btn-main" style="grid-column: span 3;"><i class="fas fa-check"></i> Valider</button>
                 </div>
 
                 <div class="game-actions">
-                    <button class="game-action-btn" id="pause-btn">⏸️ Pause</button>
-                    <button class="game-action-btn" id="restart-btn">🔄 Recommencer</button>
-                    <button class="game-action-btn" id="scores-btn">🏆 Scores</button>
+                    <button class="game-action-btn" id="pause-btn"><i class="fas fa-pause"></i> Pause</button>
+                    <button class="game-action-btn" id="restart-btn"><i class="fas fa-redo"></i> Relancer</button>
+                    <button class="game-action-btn" id="scores-btn"><i class="fas fa-trophy"></i> Scores</button>
                 </div>
             </div>
         </div>
 
         <!-- Écran de pause -->
         <div id="pause-screen" class="screen">
-            <h2>Jeu en pause</h2>
-            <button id="resume-btn" class="action-btn">Reprendre</button>
-            <button id="quit-to-menu-btn" class="action-btn">Quitter</button>
+            <div style="text-align: center; padding: 60px 20px;">
+                <h2 style="font-size: 3rem; margin-bottom: 30px;"><i class="fas fa-pause-circle"></i> Pause</h2>
+                <button class="start-btn" id="resume-btn" style="margin-bottom: 15px;">
+                    <i class="fas fa-play"></i> Reprendre
+                </button>
+                <button class="start-btn" id="quit-to-menu-btn" style="background: #ff6348;">
+                    <i class="fas fa-home"></i> Retour au menu
+                </button>
+            </div>
         </div>
 
         <!-- Écran des scores -->
         <div id="scores-screen" class="screen">
-            <h2>Meilleurs scores</h2>
-            <div id="highscores-list" class="highscores-list"></div>
-            <button id="back-to-menu-from-scores" class="action-btn">Retour</button>
-            <button id="clear-scores" class="action-btn secondary">Effacer les scores</button>
+            <div style="max-width: 600px; margin: 0 auto; padding: 30px;">
+                <h2 style="text-align: center; margin-bottom: 30px;"><i class="fas fa-trophy"></i> Meilleurs scores</h2>
+                <div class="highscores-list" id="highscores-list"></div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="start-btn" id="clear-scores" style="background: #ff6348; margin-right: 10px;">
+                        <i class="fas fa-trash"></i> Effacer
+                    </button>
+                    <button class="start-btn" id="back-to-menu-from-scores">
+                        <i class="fas fa-home"></i> Retour
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Écran de victoire -->
         <div id="victory-screen" class="screen">
-            <h2 id="victory-message"></h2>
-            <div class="confetti" id="confetti-container"></div>
-            <button id="play-again-btn" class="action-btn">Rejouer</button>
-            <button id="back-to-menu-btn" class="action-btn">Menu principal</button>
+            <div id="victory-message" style="font-size: 3rem; color: white; margin-bottom: 40px; text-shadow: 3px 3px 6px rgba(0,0,0,0.5);">
+                🏆 Victoire ! 🏆
+            </div>
+            <div id="confetti-container" class="confetti"></div>
+            <div class="victory-buttons" style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
+                <button class="start-btn" id="play-again-btn">
+                    <i class="fas fa-redo"></i> Rejouer
+                </button>
+                <button class="start-btn" id="back-to-menu-btn" style="background: #ff6348;">
+                    <i class="fas fa-home"></i> Menu principal
+                </button>
+            </div>
         </div>
     </div>
 

@@ -220,8 +220,10 @@ class Game {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    // Dans la classe Game, remplacez startTimer()
     startTimer() {
         this.timeLeft = CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit;
+        this.maxTime = this.timeLeft;
         this.updateTimerDisplay();
         
         if (this.timer) clearInterval(this.timer);
@@ -231,11 +233,12 @@ class Game {
             
             this.timeLeft--;
             this.updateTimerDisplay();
+            UI.updateTimerBar(this.timeLeft, this.maxTime);
             
             if (this.timeLeft <= 0) {
                 this.handleTimeout();
             }
-        }, 1000);
+        }, 1000); // Changé de 100ms à 1000ms (1 seconde)
     }
 
     handleTimeout() {
@@ -323,11 +326,43 @@ class Game {
         }
     }
 
+    // Dans la classe Game, modifiez moveRope()
     moveRope(team) {
         const direction = team === 1 ? -1 : 1;
         this.ropePosition += direction;
         
         UI.updateRopePosition(this.ropePosition, CONFIG.ROPE_STEPS);
+        
+        // Ajouter un effet sonore visuel (ondes)
+        this.createRippleEffect(team);
+    }
+
+    createRippleEffect(team) {
+        const indicator = team === 1 ? 
+            document.querySelector('.team1-indicator') : 
+            document.querySelector('.team2-indicator');
+        
+        if (!indicator) return;
+        
+        // Créer une onde de choc
+        const ripple = document.createElement('div');
+        ripple.style.cssText = `
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid ${team === 1 ? '#ff4757' : '#1e90ff'};
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            animation: ripple 0.6s ease-out;
+            pointer-events: none;
+        `;
+        
+        indicator.style.position = 'relative';
+        indicator.appendChild(ripple);
+        
+        setTimeout(() => ripple.remove(), 600);
     }
 
     winRound(team) {
@@ -430,6 +465,7 @@ class Game {
         document.getElementById('timer').textContent = 
             `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
+    
 }
 
 // ==================== CLASSE UI ====================
@@ -439,6 +475,8 @@ class UI {
         this.attachEventListeners();
         this.loadHighScores();
         this.createMessageContainer();
+        this.createTimerBar();
+        this.setDefaultCards();
     }
 
     static cacheElements() {
@@ -467,30 +505,96 @@ class UI {
 
     static attachEventListeners() {
         // Boutons d'accueil
-        document.getElementById('start-game').addEventListener('click', () => this.startGame());
-        document.getElementById('mode-pvp').addEventListener('click', () => this.setMode('pvp'));
-        document.getElementById('mode-pvai').addEventListener('click', () => this.setMode('pvai'));
-        
+        const startBtn = document.getElementById('start-game');
+        if (startBtn) startBtn.addEventListener('click', () => this.startGame());
+
+        // Mode cards (HTML uses .mode-card elements)
+        const modePvp = document.querySelector('.mode-card[data-mode="pvp"]');
+        if (modePvp) modePvp.addEventListener('click', (e) => {
+            const mode = e.currentTarget.dataset.mode;
+            this.setMode(mode);
+            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+        });
+        const modePvai = document.querySelector('.mode-card[data-mode="pvai"]');
+        if (modePvai) modePvai.addEventListener('click', (e) => {
+            const mode = e.currentTarget.dataset.mode;
+            this.setMode(mode);
+            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+        });
+
         // Pavé numérique
         document.querySelectorAll('.num-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.handleNumericInput(e.target.dataset.num));
+            btn.addEventListener('click', (e) => {
+                const num = e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.num : undefined;
+                if (num !== undefined) this.handleNumericInput(num);
+            });
         });
-        
-        document.getElementById('clear-btn').addEventListener('click', () => this.clearInput());
-        document.getElementById('validate-btn').addEventListener('click', () => this.validateAnswer());
-        
+
+        const clearBtn = document.getElementById('clear-btn');
+        if (clearBtn) clearBtn.addEventListener('click', () => this.clearInput());
+
+        const validateBtn = document.getElementById('validate-btn');
+        if (validateBtn) validateBtn.addEventListener('click', () => this.validateAnswer());
+        const validateMain = document.getElementById('validate-btn-main');
+        if (validateMain) validateMain.addEventListener('click', () => this.validateAnswer());
+
         // Contrôles du jeu
-        document.getElementById('pause-btn').addEventListener('click', () => this.togglePause());
-        document.getElementById('restart-btn').addEventListener('click', () => this.restartGame());
-        document.getElementById('scores-btn').addEventListener('click', () => this.showScores());
-        
+        const pauseBtn = document.getElementById('pause-btn');
+        if (pauseBtn) pauseBtn.addEventListener('click', () => this.togglePause());
+        const restartBtn = document.getElementById('restart-btn');
+        if (restartBtn) restartBtn.addEventListener('click', () => this.restartGame());
+        const scoresBtn = document.getElementById('scores-btn');
+        if (scoresBtn) scoresBtn.addEventListener('click', () => this.showScores());
+
         // Navigation
-        document.getElementById('resume-btn').addEventListener('click', () => this.resumeGame());
-        document.getElementById('quit-to-menu-btn').addEventListener('click', () => this.quitToMenu());
-        document.getElementById('back-to-menu-from-scores').addEventListener('click', () => this.showHome());
-        document.getElementById('clear-scores').addEventListener('click', () => this.clearScores());
-        document.getElementById('play-again-btn').addEventListener('click', () => this.restartGame());
-        document.getElementById('back-to-menu-btn').addEventListener('click', () => this.showHome());
+        const resumeBtn = document.getElementById('resume-btn');
+        if (resumeBtn) resumeBtn.addEventListener('click', () => this.resumeGame());
+        const quitBtn = document.getElementById('quit-to-menu-btn');
+        if (quitBtn) quitBtn.addEventListener('click', () => this.quitToMenu());
+        const backFromScores = document.getElementById('back-to-menu-from-scores');
+        if (backFromScores) backFromScores.addEventListener('click', () => this.showHome());
+        const clearScoresBtn = document.getElementById('clear-scores');
+        if (clearScoresBtn) clearScoresBtn.addEventListener('click', () => this.clearScores());
+        const playAgainBtn = document.getElementById('play-again-btn');
+        if (playAgainBtn) playAgainBtn.addEventListener('click', () => this.restartGame());
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        if (backToMenuBtn) backToMenuBtn.addEventListener('click', () => this.showHome());
+
+
+        document.querySelectorAll('.difficulty-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const difficulty = e.currentTarget.dataset.difficulty;
+                const select = document.getElementById('difficulty');
+                if (select) select.value = difficulty;
+
+                // Mettre à jour l'affichage des cartes
+                document.querySelectorAll('.difficulty-card').forEach(c => c.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
+        });
+
+        // Event listeners pour les cartes de mode (fallback)
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const mode = e.currentTarget.dataset.mode;
+                this.setMode(mode);
+                document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
+        });
+    }
+
+    // Activez la première carte par défaut
+    static setDefaultCards() {
+        // Carte difficulté par défaut (niveau 1)
+        const firstDifficulty = document.querySelector('.difficulty-card[data-difficulty="1"]');
+        if (firstDifficulty) firstDifficulty.classList.add('active');
+        
+        // Carte mode par défaut (PVP)
+        const firstMode = document.querySelector('.mode-card[data-mode="pvp"]');
+        if (firstMode) firstMode.classList.add('active');
     }
 
     static createMessageContainer() {
@@ -536,6 +640,23 @@ class UI {
             default:
                 bgColor = '#70a1ff';
         }
+
+        let icon = '';
+        switch(type) {
+            case 'success':
+                icon = '<i class="fas fa-check-circle"></i> ';
+                break;
+            case 'error':
+                icon = '<i class="fas fa-times-circle"></i> ';
+                break;
+            case 'warning':
+                icon = '<i class="fas fa-exclamation-triangle"></i> ';
+                break;
+            default:
+                icon = '<i class="fas fa-info-circle"></i> ';
+        }
+        
+        message.innerHTML = icon + text;
         
         message.style.cssText = `
             background: ${bgColor};
@@ -572,8 +693,10 @@ class UI {
 
     static setMode(mode) {
         this.currentMode = mode;
-        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(`mode-${mode}`).classList.add('active');
+        // Mettre à jour l'affichage des cartes de mode
+        document.querySelectorAll('.mode-card').forEach(btn => btn.classList.remove('active'));
+        const activeCard = document.querySelector(`.mode-card[data-mode="${mode}"]`);
+        if (activeCard) activeCard.classList.add('active');
         
         // Mettre à jour les noms des équipes en fonction du mode
         if (mode === 'pvai') {
@@ -769,7 +892,11 @@ class UI {
     static showVictory(winnerName) {
         const victoryMessage = document.getElementById('victory-message');
         if (victoryMessage) {
-            victoryMessage.textContent = `${winnerName} a gagné la partie ! 🏆`;
+            victoryMessage.innerHTML = `
+                <i class="fas fa-trophy"></i> 
+                ${winnerName} a gagné la partie ! 
+                <i class="fas fa-trophy"></i>
+            `;
         }
         this.showScreen('victory');
         this.createConfetti();
@@ -828,6 +955,155 @@ class UI {
         if (!scores) {
             localStorage.setItem('mathTugOfWarScores', JSON.stringify([]));
         }
+    }
+    // Dans la classe UI, ajoutez ces méthodes
+    static createTimerBar() {
+        const matchInfo = document.querySelector('.match-info');
+        
+        // Créer le conteneur de la barre de temps
+        const timerContainer = document.createElement('div');
+        timerContainer.className = 'timer-container';
+        timerContainer.id = 'timer-container';
+        
+        const timerProgress = document.createElement('div');
+        timerProgress.className = 'timer-progress';
+        timerProgress.id = 'timer-progress';
+        
+        timerContainer.appendChild(timerProgress);
+        matchInfo.appendChild(timerContainer);
+        
+        this.timerContainer = timerContainer;
+        this.timerProgress = timerProgress;
+    }
+
+    static updateTimerBar(timeLeft, maxTime) {
+        if (!this.timerProgress) return;
+        
+        const percentage = (timeLeft / maxTime) * 100;
+        this.timerProgress.style.width = `${percentage}%`;
+        
+        // Changer la couleur selon le temps restant
+        if (percentage > 60) {
+            this.timerProgress.style.background = 'linear-gradient(90deg, #2ed573, #7bed9f)';
+        } else if (percentage > 30) {
+            this.timerProgress.style.background = 'linear-gradient(90deg, #ffa502, #ff7f50)';
+        } else {
+            this.timerProgress.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
+            this.timerProgress.classList.add('timer-critical');
+        }
+        
+        // Animation de pulsation quand le temps est critique
+        if (percentage <= 20) {
+            this.timerProgress.style.animation = 'pulse-danger 0.5s infinite';
+        } else {
+            this.timerProgress.style.animation = 'none';
+        }
+    }
+
+    // Modifiez la méthode init() pour appeler createTimerBar()
+    static init() {
+        this.cacheElements();
+        this.attachEventListeners();
+        this.loadHighScores();
+        this.createMessageContainer();
+        this.createTimerBar();
+        this.setDefaultCards(); // Ajoutez cette ligne
+    }
+
+    // Dans la classe UI, remplacez updateRopePosition()
+    static updateRopePosition(position, maxSteps) {
+        if (!this.ropeCenter) return;
+        
+        const percentage = (position / maxSteps) * 50;
+        const newLeft = `calc(50% + ${percentage}%)`;
+        
+        // Animation plus dynamique avec elastic effect
+        this.ropeCenter.style.transition = 'left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        this.ropeCenter.style.left = newLeft;
+        
+        // Ajouter un effet de tension sur la corde
+        this.updateRopeTension(position, maxSteps);
+        
+        // Animer les indicateurs d'équipe
+        this.animateTeamIndicators(position);
+        
+        // Effet de secousse quand la corde bouge beaucoup
+        if (Math.abs(position) > maxSteps * 0.7) {
+            this.ropeCenter.classList.add('rope-glow');
+            this.createRopeStrain();
+        } else {
+            this.ropeCenter.classList.remove('rope-glow');
+        }
+        
+        // Animation de rebond
+        this.ropeCenter.style.transform = `translate(-50%, -50%) scale(1.3)`;
+        setTimeout(() => {
+            if (this.ropeCenter) {
+                this.ropeCenter.style.transform = `translate(-50%, -50%) scale(1)`;
+            }
+        }, 200);
+    }
+
+    static updateRopeTension(position, maxSteps) {
+        // Supprimer les anciennes tensions
+        document.querySelectorAll('.rope-strain').forEach(el => el.remove());
+        
+        const tension = Math.abs(position) / maxSteps;
+        if (tension > 0.3) {
+            // Ajouter des effets de tension sur la corde
+            const ropeContainer = document.querySelector('.rope-container');
+            
+            const leftStrain = document.createElement('div');
+            leftStrain.className = 'rope-strain left';
+            leftStrain.style.width = `${tension * 50}px`;
+            
+            const rightStrain = document.createElement('div');
+            rightStrain.className = 'rope-strain right';
+            rightStrain.style.width = `${tension * 50}px`;
+            
+            ropeContainer.appendChild(leftStrain);
+            ropeContainer.appendChild(rightStrain);
+            
+            // Supprimer après l'animation
+            setTimeout(() => {
+                leftStrain.remove();
+                rightStrain.remove();
+            }, 300);
+        }
+    }
+
+    static animateTeamIndicators(position) {
+        const team1Indicator = document.querySelector('.team1-indicator');
+        const team2Indicator = document.querySelector('.team2-indicator');
+        
+        if (!team1Indicator || !team2Indicator) return;
+        
+        if (position < -3) {
+            // Équipe 1 tire
+            team1Indicator.classList.add('pulled');
+            team2Indicator.classList.remove('pulled');
+        } else if (position > 3) {
+            // Équipe 2 tire
+            team2Indicator.classList.add('pulled');
+            team1Indicator.classList.remove('pulled');
+        } else {
+            team1Indicator.classList.remove('pulled');
+            team2Indicator.classList.remove('pulled');
+        }
+    }
+
+    static createRopeStrain() {
+        // Créer un effet de vibration quand la corde est tendue
+        const ropeCenter = this.ropeCenter;
+        if (!ropeCenter) return;
+        
+        ropeCenter.style.animation = 'ropePulse 0.5s infinite';
+        
+        setTimeout(() => {
+            if (ropeCenter) {
+                ropeCenter.style.animation = 'none';
+            }
+        }, 500);
     }
 }
 
