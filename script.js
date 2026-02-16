@@ -595,6 +595,12 @@ class UI {
                 e.currentTarget.classList.add('active');
             });
         });
+
+        // Dans attachEventListeners(), ajoutez :
+        const deleteBtn = document.getElementById('delete-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => this.deleteLastDigit());
+        }
     }
 
     // Activez la première carte par défaut
@@ -889,30 +895,17 @@ class UI {
         this.showScreen('home');
     }
 
-    // Dans UI.showVictory(), ajoutez un effet de
     static showVictory(winnerName) {
         const victoryMessage = document.getElementById('victory-message');
         if (victoryMessage) {
             victoryMessage.innerHTML = `
-                <i class="fas fa-trophy" style="color: gold;"></i> 
+                <i class="fas fa-trophy"></i> 
                 ${winnerName} a gagné la partie ! 
-                <i class="fas fa-trophy" style="color: gold;"></i>
+                <i class="fas fa-trophy"></i>
             `;
         }
         this.showScreen('victory');
         this.createConfetti();
-        
-        // Ajouter un effet sonore visuel
-        document.body.style.animation = 'victoryFlash 0.5s 3';
-        setTimeout(() => {
-            document.body.style.animation = '';
-        }, 1500);
-    }
-
-    // Ajoutez dans le CSS :
-    @keyframes victoryFlash {
-        0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        50% { background: linear-gradient(135deg, gold 0%, orange 100%); }
     }
 
     static createConfetti() {
@@ -1122,6 +1115,28 @@ class UI {
                 ropeCenter.style.animation = 'none';
             }
         }, 500);
+    }
+
+    static deleteLastDigit() {
+        if (!game || game.isPaused || game.waitingForAnswer) return;
+        
+        if (game.gameMode === 'pvai' && game.activeTeam === 2) {
+            this.showMessage("C'est à l'IA de jouer !", 'warning');
+            return;
+        }
+        
+        const currentTeam = game.activeTeam === 1 ? game.team1 : game.team2;
+        const currentAnswer = currentTeam.currentAnswer;
+        
+        if (currentAnswer.length > 0) {
+            currentTeam.setAnswer(currentAnswer.slice(0, -1));
+            
+            if (game.activeTeam === 1) {
+                if (this.team1Answer) this.team1Answer.textContent = currentTeam.currentAnswer || '?';
+            } else {
+                if (this.team2Answer) this.team2Answer.textContent = currentTeam.currentAnswer || '?';
+            }
+        }
     }
 }
 
