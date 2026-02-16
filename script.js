@@ -543,7 +543,14 @@ class UI {
         if (clearBtn) clearBtn.addEventListener('click', () => this.clearInput());
 
         const validateBtn = document.getElementById('validate-btn');
-        if (validateBtn) validateBtn.addEventListener('click', () => this.validateAnswer());
+        const validateMain = document.getElementById('validate-btn-main');
+
+        if (validateBtn) {
+            validateBtn.addEventListener('click', () => this.validateAnswer());
+        }
+        if (validateMain) {
+            validateMain.addEventListener('click', () => this.validateAnswer());
+        }
 
         // Contrôles du jeu
         const pauseBtn = document.getElementById('pause-btn');
