@@ -550,9 +550,6 @@ class UI {
             });
         });
 
-        const clearBtn = document.getElementById('clear-btn');
-        if (clearBtn) clearBtn.addEventListener('click', () => this.clearInput());
-
         const validateBtn = document.getElementById('validate-btn');
         const validateMain = document.getElementById('validate-btn-main');
 
@@ -618,10 +615,14 @@ class UI {
             });
         });
 
-        // Dans attachEventListeners(), ajoutez :
         const deleteBtn = document.getElementById('delete-btn');  // Efface dernier chiffre
         if (deleteBtn) {
             deleteBtn.addEventListener('click', () => this.deleteLastDigit());
+        }
+
+        const clearBtn = document.getElementById('clear-btn');    // Efface tout
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.clearAllInput());
         }
     }
 
@@ -1161,13 +1162,34 @@ class UI {
         
         if (currentAnswer.length > 0) {
             currentTeam.setAnswer(currentAnswer.slice(0, -1));
-            
-            if (game.activeTeam === 1) {
-                if (this.team1Answer) this.team1Answer.textContent = currentTeam.currentAnswer || '?';
-            } else {
-                if (this.team2Answer) this.team2Answer.textContent = currentTeam.currentAnswer || '?';
-            }
+            this.updateAnswerDisplay();
+        } else {
+            this.showMessage("Aucun chiffre à effacer", 'info');
         }
+    }
+
+    static clearAllInput() {
+        if (!game || game.isPaused || game.waitingForAnswer) return;
+        
+        if (game.gameMode === 'pvai' && game.activeTeam === 2) {
+            this.showMessage("C'est à l'IA de jouer !", 'warning');
+            return;
+        }
+        
+        const currentTeam = game.activeTeam === 1 ? game.team1 : game.team2;
+        currentTeam.clearAnswer();
+        this.updateAnswerDisplay();
+        this.showMessage("Réponse effacée", 'info');
+    }
+
+    static updateAnswerDisplay() {
+        if (!game) return;
+        
+        const team1Answer = game.team1.currentAnswer || '?';
+        const team2Answer = game.team2.currentAnswer || '?';
+        
+        if (this.team1Answer) this.team1Answer.textContent = team1Answer;
+        if (this.team2Answer) this.team2Answer.textContent = team2Answer;
     }
 }
 
