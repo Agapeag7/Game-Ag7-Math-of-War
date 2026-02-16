@@ -720,24 +720,25 @@ class UI {
         }
     }
 
+    // Dans UI.showTurnIndicator(), ajoutez :
     static showTurnIndicator(team) {
-        // Vérifier que les éléments existent
         if (!this.team1Area || !this.team2Area) return;
         
-        // Mettre en évidence l'équipe qui doit jouer
-        this.team1Area.style.opacity = team === 1 ? '1' : '0.5';
-        this.team2Area.style.opacity = team === 2 ? '1' : '0.5';
+        // Enlever la classe active des deux
+        this.team1Area.classList.remove('active-team');
+        this.team2Area.classList.remove('active-team');
         
-        // Ajouter un indicateur visuel
-        const activeArea = team === 1 ? this.team1Area : this.team2Area;
-        activeArea.style.transform = 'scale(1.02)';
-        activeArea.style.transition = 'all 0.3s ease';
+        // Ajouter la classe active à l'équipe concernée
+        if (team === 1) {
+            this.team1Area.classList.add('active-team');
+            this.team1Area.style.opacity = '1';
+            this.team2Area.style.opacity = '0.7';
+        } else {
+            this.team2Area.classList.add('active-team');
+            this.team2Area.style.opacity = '1';
+            this.team1Area.style.opacity = '0.7';
+        }
         
-        setTimeout(() => {
-            activeArea.style.transform = 'scale(1)';
-        }, 300);
-        
-        // Message pour indiquer à qui est le tour
         if (game) {
             const teamName = team === 1 ? game.team1.name : (game.gameMode === 'pvai' && team === 2 ? 'IA' : game.team2.name);
             this.showMessage(`Au tour de ${teamName} !`, 'info');
