@@ -908,13 +908,19 @@ class UI {
         const victoryMessage = document.getElementById('victory-message');
         if (victoryMessage) {
             victoryMessage.innerHTML = `
-                <i class="fas fa-trophy"></i> 
+                <i class="fas fa-trophy" style="color: gold;"></i> 
                 ${winnerName} a gagné la partie ! 
-                <i class="fas fa-trophy"></i>
+                <i class="fas fa-trophy" style="color: gold;"></i>
             `;
         }
         this.showScreen('victory');
         this.createConfetti();
+        
+        // Ajouter un effet sonore visuel
+        document.body.style.animation = 'victoryFlash 0.5s 3';
+        setTimeout(() => {
+            document.body.style.animation = '';
+        }, 1500);
     }
 
     static createConfetti() {
