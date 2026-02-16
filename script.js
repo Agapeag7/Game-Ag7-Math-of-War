@@ -810,19 +810,21 @@ class UI {
         }
     }
 
+    // Modifiez updateQuestion() dans UI :
     static updateQuestion(team, operation) {
-        // Lorsqu'une nouvelle question est affichée, réinitialiser l'état de la réponse
         if (team === 1) {
             if (this.team1Question) {
                 if (window.game && game.team1) game.team1.clearAnswer();
                 this.team1Question.innerHTML = `${operation} = <span class="answer" id="team1-answer">?</span>`;
-                this.team1Answer = this.team1Question.querySelector('.answer');
+                // Recache l'élément answer
+                this.team1Answer = document.getElementById('team1-answer');
             }
         } else {
             if (this.team2Question) {
                 if (window.game && game.team2) game.team2.clearAnswer();
                 this.team2Question.innerHTML = `${operation} = <span class="answer" id="team2-answer">?</span>`;
-                this.team2Answer = this.team2Question.querySelector('.answer');
+                // Recache l'élément answer
+                this.team2Answer = document.getElementById('team2-answer');
             }
         }
     }
