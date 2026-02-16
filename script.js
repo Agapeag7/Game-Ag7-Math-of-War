@@ -403,7 +403,18 @@ class Game {
         }
     }
 
+    // Dans Game.endGame(), assurez-vous d'arrêter tous les timers
     endGame(winner) {
+        // Arrêter tous les timers
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+        if (this.iaTimeout) {
+            clearTimeout(this.iaTimeout);
+            this.iaTimeout = null;
+        }
+        
         const winnerName = winner === 1 ? this.team1.name : (this.gameMode === 'pvai' ? 'IA' : this.team2.name);
         UI.showVictory(winnerName);
         this.saveHighScore(winnerName);
