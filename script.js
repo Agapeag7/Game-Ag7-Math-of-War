@@ -619,7 +619,7 @@ class UI {
         });
 
         // Dans attachEventListeners(), ajoutez :
-        const deleteBtn = document.getElementById('delete-btn');
+        const deleteBtn = document.getElementById('delete-btn');  // Efface dernier chiffre
         if (deleteBtn) {
             deleteBtn.addEventListener('click', () => this.deleteLastDigit());
         }

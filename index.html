@@ -164,24 +164,34 @@
             <!-- Contrôles -->
             <div class="controls-area">
                 <div class="numeric-pad">
+                    <!-- Première ligne -->
                     <button class="num-btn" data-num="1">1</button>
                     <button class="num-btn" data-num="2">2</button>
                     <button class="num-btn" data-num="3">3</button>
-                    <button class="action-btn clear-btn" id="clear-btn"><i class="fas fa-backspace"></i></button>
+                    <button class="action-btn delete-btn" id="delete-btn" title="Effacer le dernier chiffre">
+                        <i class="fas fa-backspace"></i>
+                    </button>
                     
+                    <!-- Deuxième ligne -->
                     <button class="num-btn" data-num="4">4</button>
                     <button class="num-btn" data-num="5">5</button>
                     <button class="num-btn" data-num="6">6</button>
-                    <button class="action-btn delete-btn" id="delete-btn"><i class="fas fa-trash"></i> Effacer</button>
+                    <button class="action-btn clear-btn" id="clear-btn" title="Effacer toute la réponse">
+                        <i class="fas fa-trash"></i>
+                    </button>
                     
+                    <!-- Troisième ligne -->
                     <button class="num-btn" data-num="7">7</button>
                     <button class="num-btn" data-num="8">8</button>
                     <button class="num-btn" data-num="9">9</button>
-                    <button class="action-btn" id="validate-btn"><i class="fas fa-check"></i> OK</button>
+                    <button class="action-btn" id="validate-btn" title="Valider (OK)">
+                        <i class="fas fa-check"></i>
+                    </button>
                     
+                    <!-- Quatrième ligne -->
                     <button class="num-btn" data-num="0">0</button>
-                    <button class="action-btn" id="validate-btn-main" style="grid-column: span 3; background: var(--success);">
-                        <i class="fas fa-check-circle"></i> Valider la réponse
+                    <button class="action-btn" id="validate-btn-main" style="grid-column: span 3; background: var(--success);" title="Valider la réponse">
+                        <i class="fas fa-check-circle"></i> Valider
                     </button>
                 </div>
 
