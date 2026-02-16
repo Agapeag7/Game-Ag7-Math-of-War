@@ -1,5 +1,5 @@
 /**
- * Math Tug of War - Version corrigée
+ * AG7 Mind Clash - Version corrigée
  */
 
 // ==================== CONFIGURATION ====================
@@ -371,9 +371,11 @@ class Game {
     }
 
     winRound(team) {
-        // Arrêter le timer
+        // Arrêter le timer et l'IA
         if (this.timer) clearInterval(this.timer);
+        this.timer = null;
         if (this.iaTimeout) clearTimeout(this.iaTimeout);
+        this.iaTimeout = null;
         
         // Ajouter la manche gagnée
         if (team === 1) {
@@ -542,8 +544,6 @@ class UI {
 
         const validateBtn = document.getElementById('validate-btn');
         if (validateBtn) validateBtn.addEventListener('click', () => this.validateAnswer());
-        const validateMain = document.getElementById('validate-btn-main');
-        if (validateMain) validateMain.addEventListener('click', () => this.validateAnswer());
 
         // Contrôles du jeu
         const pauseBtn = document.getElementById('pause-btn');
@@ -567,6 +567,12 @@ class UI {
         const backToMenuBtn = document.getElementById('back-to-menu-btn');
         if (backToMenuBtn) backToMenuBtn.addEventListener('click', () => this.showHome());
 
+        // Raccourci clavier : Entrée pour valider
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && game && !game.isPaused && !game.waitingForAnswer) {
+                this.validateAnswer();
+            }
+        });
 
         document.querySelectorAll('.difficulty-card').forEach(card => {
             card.addEventListener('click', (e) => {
@@ -622,46 +628,31 @@ class UI {
         this.messageContainer = container;
     }
 
+    // Dans UI.showMessage(), enlevez la ligne en double :
     static showMessage(text, type = 'info') {
-        // S'assurer que le conteneur existe
         if (!this.messageContainer) {
             this.createMessageContainer();
         }
         
         const message = document.createElement('div');
         
-        // Définir la couleur selon le type
         let bgColor;
         switch(type) {
-            case 'success':
-                bgColor = '#2ed573';
-                break;
-            case 'error':
-                bgColor = '#ff4757';
-                break;
-            case 'warning':
-                bgColor = '#ffa502';
-                break;
-            default:
-                bgColor = '#70a1ff';
+            case 'success': bgColor = '#2ed573'; break;
+            case 'error': bgColor = '#ff4757'; break;
+            case 'warning': bgColor = '#ffa502'; break;
+            default: bgColor = '#70a1ff';
         }
 
         let icon = '';
         switch(type) {
-            case 'success':
-                icon = '<i class="fas fa-check-circle"></i> ';
-                break;
-            case 'error':
-                icon = '<i class="fas fa-times-circle"></i> ';
-                break;
-            case 'warning':
-                icon = '<i class="fas fa-exclamation-triangle"></i> ';
-                break;
-            default:
-                icon = '<i class="fas fa-info-circle"></i> ';
+            case 'success': icon = '<i class="fas fa-check-circle"></i> '; break;
+            case 'error': icon = '<i class="fas fa-times-circle"></i> '; break;
+            case 'warning': icon = '<i class="fas fa-exclamation-triangle"></i> '; break;
+            default: icon = '<i class="fas fa-info-circle"></i> ';
         }
         
-        message.innerHTML = icon + text;
+        message.innerHTML = icon + text;  // Utiliser innerHTML au lieu de textContent
         
         message.style.cssText = `
             background: ${bgColor};
@@ -675,17 +666,12 @@ class UI {
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             pointer-events: none;
         `;
-        message.textContent = text;
         
         this.messageContainer.appendChild(message);
         
         setTimeout(() => {
             message.style.animation = 'slideUp 0.3s ease';
-            setTimeout(() => {
-                if (message.parentNode) {
-                    message.remove();
-                }
-            }, 300);
+            setTimeout(() => message.remove(), 300);
         }, 2000);
     }
 
@@ -903,17 +889,30 @@ class UI {
         this.showScreen('home');
     }
 
+    // Dans UI.showVictory(), ajoutez un effet de
     static showVictory(winnerName) {
         const victoryMessage = document.getElementById('victory-message');
         if (victoryMessage) {
             victoryMessage.innerHTML = `
-                <i class="fas fa-trophy"></i> 
+                <i class="fas fa-trophy" style="color: gold;"></i> 
                 ${winnerName} a gagné la partie ! 
-                <i class="fas fa-trophy"></i>
+                <i class="fas fa-trophy" style="color: gold;"></i>
             `;
         }
         this.showScreen('victory');
         this.createConfetti();
+        
+        // Ajouter un effet sonore visuel
+        document.body.style.animation = 'victoryFlash 0.5s 3';
+        setTimeout(() => {
+            document.body.style.animation = '';
+        }, 1500);
+    }
+
+    // Ajoutez dans le CSS :
+    @keyframes victoryFlash {
+        0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        50% { background: linear-gradient(135deg, gold 0%, orange 100%); }
     }
 
     static createConfetti() {
@@ -970,9 +969,14 @@ class UI {
             localStorage.setItem('mathTugOfWarScores', JSON.stringify([]));
         }
     }
-    // Dans la classe UI, ajoutez ces méthodes
+    // Dans UI.createTimerBar(), vérifiez que matchInfo existe
     static createTimerBar() {
         const matchInfo = document.querySelector('.match-info');
+        if (!matchInfo) return;
+        
+        // Supprimer l'ancienne barre si elle existe
+        const oldBar = document.getElementById('timer-container');
+        if (oldBar) oldBar.remove();
         
         // Créer le conteneur de la barre de temps
         const timerContainer = document.createElement('div');
