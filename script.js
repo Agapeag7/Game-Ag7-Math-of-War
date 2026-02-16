@@ -588,6 +588,10 @@ class UI {
         // Raccourci clavier : Entrée pour valider
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && game && !game.isPaused && !game.waitingForAnswer) {
+                if (game.gameMode === 'pvai' && game.activeTeam === 2) {
+                    this.showMessage("C'est à l'IA de jouer !", 'warning');
+                    return;
+                }
                 this.validateAnswer();
             }
         });
