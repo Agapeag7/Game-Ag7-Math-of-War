@@ -226,6 +226,67 @@ class Game {
         
         // Interface des bonus
         this.setupBonusPanel();
+
+        this.bonuses = [];
+    
+        // Tentatives
+        this.attempts = {
+            1: 3,
+            2: 3
+        };
+        this.maxAttempts = 3;
+    }
+
+    tryAddBonus() {
+        if (Math.random() < 0.4) { // 40% de chance
+            const bonusTypes = [
+                { 
+                    name: "💪 Double points", 
+                    icon: "⭐",
+                    effect: (game) => {
+                        game.pointMultiplier = 2;
+                        UI.showMessage("💪 Double points pour ce tour !", 'success');
+                    }
+                },
+                { 
+                    name: "➕ Tentative", 
+                    icon: "➕",
+                    effect: (game, team) => {
+                        game.attempts[team]++;
+                        UI.updateAttempts();
+                        UI.showMessage("➕ Tentative supplémentaire !", 'success');
+                    }
+                },
+                { 
+                    name: "🛡️ Bouclier", 
+                    icon: "🛡️",
+                    effect: (game, team) => {
+                        game.shieldActive = true;
+                        game.shieldTeam = team;
+                        UI.showMessage("🛡️ Bouclier activé !", 'success');
+                    }
+                }
+            ];
+            
+            const bonus = bonusTypes[Math.floor(Math.random() * bonusTypes.length)];
+            this.bonuses.push(bonus);
+            UI.updateBonusList(this.bonuses);
+            UI.showMessage(`✨ Bonus obtenu : ${bonus.name} !`, 'success');
+        }
+    }
+
+    useBonus(index) {
+        if (index >= this.bonuses.length) return;
+        
+        const bonus = this.bonuses[index];
+        const team = this.activeTeam;
+        
+        // Appliquer l'effet
+        bonus.effect(this, team);
+        
+        // Retirer le bonus
+        this.bonuses.splice(index, 1);
+        UI.updateBonusList(this.bonuses);
     }
 
     setupBonusPanel() {
@@ -633,10 +694,6 @@ class Game {
             return;
         }
         
-        // Décrémenter les tentatives
-        this.attemptsLeft[this.activeTeam]--;
-        UI.updateAttempts();
-        
         this.waitingForAnswer = true;
         
         // Arrêter le timer
@@ -650,17 +707,18 @@ class Game {
             UI.showEffect('correct', this.activeTeam);
             UI.showMessage("Bonne réponse ! 🎉", 'success');
             
-            // Récompenser avec un bonus (80% de chance)
-            this.awardBonus(this.activeTeam);
+            // Récompenser avec un bonus (40%)
+            this.tryAddBonus();
             
-            // Appliquer les power-ups (multiplicateur)
+            // Déplacer la corde (avec multiplicateur)
             const points = this.pointMultiplier || 1;
             for (let i = 0; i < points; i++) {
                 this.moveRope(this.activeTeam);
             }
+            this.pointMultiplier = 1; // Reset
             
-            // Réinitialiser le multiplicateur
-            this.pointMultiplier = 1;
+            // Réinitialiser les tentatives
+            this.attempts[this.activeTeam] = this.maxAttempts;
             
             // Vérifier victoire
             if (Math.abs(this.ropePosition) >= CONFIG.ROPE_STEPS) {
@@ -668,7 +726,7 @@ class Game {
                 return;
             }
             
-            // Passer au tour suivant (avec réinitialisation des tentatives)
+            // Passer à l'autre équipe
             setTimeout(() => {
                 this.switchTeam();
                 this.prepareNextTurn();
@@ -677,17 +735,20 @@ class Game {
         } else {
             // Mauvaise réponse
             UI.showEffect('wrong', this.activeTeam);
-            UI.showMessage("Mauvaise réponse ! ❌", 'success');
+            
+            // Décrémenter les tentatives ICI
+            this.attempts[this.activeTeam]--;
+            UI.updateAttempts(); // Met à jour l'affichage
+            
+            UI.showMessage(`Mauvaise réponse ! Tentatives restantes: ${this.attempts[this.activeTeam]}`, 'error');
             
             // Vérifier bouclier
             if (this.shieldActive && this.shieldTeam === this.activeTeam) {
                 this.shieldActive = false;
-                UI.showMessage("🛡️ Bouclier vous protège ! Pas de pénalité", 'success');
-                
-                // Récupérer la tentative
-                this.attemptsLeft[this.activeTeam]++;
+                UI.showMessage("🛡️ Bouclier vous protège !", 'success');
+                // Récupérer la tentative perdue
+                this.attempts[this.activeTeam]++;
                 UI.updateAttempts();
-                
                 this.waitingForAnswer = false;
                 currentTeam.clearAnswer();
                 UI.clearAnswerDisplay();
@@ -695,31 +756,11 @@ class Game {
                 return;
             }
             
-            // Vérifier vie extra
-            if (this.extraLife && this.extraLifeTeam === this.activeTeam) {
-                this.extraLife = false;
-                UI.showMessage("❤️ Vie extra ! Vous ne perdez pas de terrain", 'success');
-                
-                this.waitingForAnswer = false;
-                currentTeam.clearAnswer();
-                UI.clearAnswerDisplay();
-                this.startTimer();
-                return;
-            }
-            
-            // Vérifier s'il reste des tentatives
-            if (this.attemptsLeft[this.activeTeam] > 0) {
-                // Il reste des tentatives, on peut réessayer
-                UI.showMessage(`Il vous reste ${this.attemptsLeft[this.activeTeam]} tentative(s)`, 'info');
-                this.waitingForAnswer = false;
-                currentTeam.clearAnswer();
-                UI.clearAnswerDisplay();
-                this.startTimer();
-            } else {
-                // Plus de tentatives, on passe à l'adversaire
+            if (this.attempts[this.activeTeam] <= 0) {
+                // Plus de tentatives, passage à l'adversaire
                 UI.showMessage("Plus de tentatives ! Passage à l'adversaire", 'warning');
                 
-                // Déplacer la corde vers l'adversaire (pénalité)
+                // Pénalité : la corde bouge vers l'adversaire
                 const otherTeam = this.activeTeam === 1 ? 2 : 1;
                 this.moveRope(otherTeam);
                 
@@ -728,12 +769,22 @@ class Game {
                     return;
                 }
                 
-                // Réinitialiser les tentatives pour le prochain tour
-                this.attemptsLeft[this.activeTeam] = this.maxAttempts;
+                // Réinitialiser les tentatives pour l'équipe active
+                this.attempts[this.activeTeam] = this.maxAttempts;
+                UI.updateAttempts();
                 
                 setTimeout(() => {
                     this.switchTeam();
                     this.prepareNextTurn();
+                }, CONFIG.ANIMATION_DURATION);
+                
+            } else {
+                // Il reste des tentatives, on réessaye
+                setTimeout(() => {
+                    this.waitingForAnswer = false;
+                    currentTeam.clearAnswer();
+                    UI.clearAnswerDisplay();
+                    this.startTimer();
                 }, CONFIG.ANIMATION_DURATION);
             }
         }
@@ -850,7 +901,22 @@ class Game {
         this.iaTimeout = setTimeout(() => {
             if (this.isPaused || this.gameMode !== 'pvai' || this.activeTeam !== 2 || this.waitingForAnswer) return;
             
-            this.handleIAResponse();
+            const currentTeam = this.team2;
+            
+            // L'IA répond (avec taux d'erreur)
+            if (Math.random() < settings.aiErrorRate) {
+                // Erreur
+                currentTeam.setAnswer("999"); // Réponse fausse évidente
+                UI.showMessage("L'IA fait une erreur !", 'error');
+            } else {
+                // Correct
+                currentTeam.setAnswer(currentTeam.currentOperation.result.toString());
+                UI.showMessage("L'IA répond correctement !", 'success');
+            }
+            
+            // Traiter la réponse
+            this.handleAnswer();
+            
         }, settings.aiSpeed);
     }
 
@@ -923,6 +989,18 @@ class UI {
         this.createMessageContainer();
         this.createTimerBar();
         this.setDefaultCards();
+        this.setupBonusUI(); // NOUVEAU
+        
+        // Raccourci clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && game && !game.isPaused && !game.waitingForAnswer) {
+                if (game.gameMode === 'pvai' && game.activeTeam === 2) {
+                    this.showMessage("C'est à l'IA de jouer !", 'warning');
+                    return;
+                }
+                this.validateAnswer();
+            }
+        });
     }
 
     static cacheElements() {
@@ -1758,27 +1836,105 @@ class UI {
         const attempts2 = document.getElementById('attempts-2');
         
         if (attempts1) {
-            attempts1.textContent = window.game.attemptsLeft[1];
-            // Effet visuel si peu de tentatives
-            if (window.game.attemptsLeft[1] <= 1) {
+            attempts1.textContent = window.game.attempts[1];
+            // Changement de couleur si plus qu'une tentative
+            if (window.game.attempts[1] <= 1) {
                 attempts1.style.color = '#ff4757';
-                attempts1.style.animation = 'pulse 1s infinite';
+                attempts1.style.fontWeight = 'bold';
             } else {
                 attempts1.style.color = '';
-                attempts1.style.animation = '';
+                attempts1.style.fontWeight = '';
             }
         }
         
         if (attempts2) {
-            attempts2.textContent = window.game.attemptsLeft[2];
-            if (window.game.attemptsLeft[2] <= 1) {
+            attempts2.textContent = window.game.attempts[2];
+            if (window.game.attempts[2] <= 1) {
                 attempts2.style.color = '#ff4757';
-                attempts2.style.animation = 'pulse 1s infinite';
+                attempts2.style.fontWeight = 'bold';
             } else {
                 attempts2.style.color = '';
-                attempts2.style.animation = '';
+                attempts2.style.fontWeight = '';
             }
         }
+    }
+
+    static setupBonusUI() {
+        // Créer la barre de bonus si elle n'existe pas
+        if (!document.querySelector('.bonus-bar')) {
+            const gameScreen = document.getElementById('game-screen');
+            const bonusBar = document.createElement('div');
+            bonusBar.className = 'bonus-bar';
+            bonusBar.innerHTML = `
+                <div class="bonus-toggle" id="bonus-toggle">
+                    <i class="fas fa-gift"></i> Bonus <span id="bonus-count">0</span>
+                </div>
+                <div class="bonus-dropdown" id="bonus-dropdown" style="display: none;">
+                    <div class="bonus-list-compact" id="bonus-list"></div>
+                </div>
+                <div class="attempts-compact">
+                    <span class="attempts-team1">🔴 <span id="attempts-1">3</span></span>
+                    <span class="attempts-team2">🔵 <span id="attempts-2">3</span></span>
+                </div>
+            `;
+            
+            // Insérer après le game-area
+            const gameArea = document.querySelector('.game-area');
+            gameArea.parentNode.insertBefore(bonusBar, gameArea.nextSibling);
+            
+            // Event listener pour le toggle
+            document.getElementById('bonus-toggle').addEventListener('click', () => {
+                const dropdown = document.getElementById('bonus-dropdown');
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+    }
+
+    static updateBonusList(bonuses) {
+        const list = document.getElementById('bonus-list');
+        const count = document.getElementById('bonus-count');
+        
+        if (!list || !count) return;
+        
+        count.textContent = bonuses.length;
+        
+        if (bonuses.length === 0) {
+            list.innerHTML = '<div style="padding: 10px; text-align: center;">Aucun bonus</div>';
+            return;
+        }
+        
+        list.innerHTML = bonuses.map((bonus, index) => `
+            <div class="bonus-item-compact" data-index="${index}">
+                <span style="font-size: 1.5rem;">${bonus.icon}</span>
+                <span style="flex: 1;">${bonus.name}</span>
+                <button class="use-bonus-btn-small" data-index="${index}">
+                    <i class="fas fa-bolt"></i>
+                </button>
+            </div>
+        `).join('');
+        
+        // Ajouter les event listeners
+        list.querySelectorAll('.bonus-item-compact').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON' || e.target.parentElement.tagName === 'BUTTON') return;
+                const index = item.dataset.index;
+                if (window.game) {
+                    window.game.useBonus(parseInt(index));
+                    document.getElementById('bonus-dropdown').style.display = 'none';
+                }
+            });
+        });
+        
+        list.querySelectorAll('.use-bonus-btn-small').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const index = btn.dataset.index;
+                if (window.game) {
+                    window.game.useBonus(parseInt(index));
+                    document.getElementById('bonus-dropdown').style.display = 'none';
+                }
+            });
+        });
     }
 }
 
