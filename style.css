@@ -864,6 +864,143 @@ body {
     transition: all 0.3s ease;
 }
 
+.bonus-panel {
+    background: linear-gradient(135deg, #667eea20, #764ba220);
+    backdrop-filter: blur(5px);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.bonus-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: gold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.bonus-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.team-bonus {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 15px;
+}
+
+.team-bonus h4 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.bonus-list {
+    min-height: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.bonus-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: bonusAppear 0.5s ease;
+}
+
+.bonus-item:hover {
+    transform: translateX(5px);
+    background: rgba(255,255,255,0.2);
+}
+
+.bonus-icon {
+    font-size: 2rem;
+    min-width: 40px;
+    text-align: center;
+}
+
+.bonus-info {
+    flex: 1;
+}
+
+.bonus-name {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.bonus-desc {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.use-bonus-btn {
+    background: gold;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: black;
+}
+
+.use-bonus-btn:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px gold;
+}
+
+.no-bonus {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+}
+
+.attempts-indicator {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50px;
+}
+
+.attempts {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+}
+
+.attempt-count {
+    font-size: 1.8rem;
+    font-weight: bold;
+    background: white;
+    color: black;
+    padding: 5px 15px;
+    border-radius: 30px;
+    min-width: 60px;
+    text-align: center;
+}
+
+@keyframes bonusAppear {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
 .question-display {
     text-align: center;
     font-size: 2.5rem;
