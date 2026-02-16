@@ -60,6 +60,124 @@ class Team {
     }
 }
 
+class PowerUp {
+    constructor() {
+        this.types = [
+            { 
+                id: 'double_points',
+                name: "💪 Double points", 
+                icon: "⭐",
+                description: "La prochaine bonne réponse rapporte 2 points !",
+                color: "#ffd700",
+                effect: (game) => {
+                    game.pointMultiplier = 2;
+                    game.powerUpActive = 'double_points';
+                    game.powerUpDuration = 1; // 1 tour
+                }
+            },
+            { 
+                id: 'time_freeze',
+                name: "❄️ Gel du temps", 
+                icon: "⏸️",
+                description: "Le chrono s'arrête pour l'adversaire !",
+                color: "#00cec9",
+                effect: (game) => {
+                    game.timeFrozen = true;
+                    setTimeout(() => game.timeFrozen = false, 5000);
+                }
+            },
+            { 
+                id: 'shield',
+                name: "🛡️ Bouclier", 
+                icon: "🛡️",
+                description: "Protège contre une mauvaise réponse",
+                color: "#0984e3",
+                effect: (game) => {
+                    game.shieldActive = true;
+                    game.shieldTeam = game.activeTeam;
+                }
+            },
+            { 
+                id: 'auto_answer',
+                name: "🤖 Réponse auto", 
+                icon: "⚡",
+                description: "La bonne réponse s'affiche automatiquement",
+                color: "#fdcb6e",
+                effect: (game) => {
+                    const currentTeam = game.activeTeam === 1 ? game.team1 : game.team2;
+                    currentTeam.setAnswer(currentTeam.currentOperation.result.toString());
+                    UI.updateAnswerDisplay();
+                    UI.showMessage("✨ Réponse automatique !", 'success');
+                }
+            },
+            { 
+                id: 'speed_boost',
+                name: "🚀 Turbo", 
+                icon: "⚡",
+                description: "L'adversaire a moins de temps pour répondre",
+                color: "#e17055",
+                effect: (game) => {
+                    game.opponentTimeReduced = true;
+                    game.timeReduction = 0.5; // 50% de temps en moins
+                }
+            },
+            { 
+                id: 'confusion',
+                name: "🌀 Confusion", 
+                icon: "😵",
+                description: "Mélange les chiffres chez l'adversaire",
+                color: "#6c5ce7",
+                effect: (game) => {
+                    game.confusionActive = true;
+                    game.confusionTeam = game.activeTeam === 1 ? 2 : 1;
+                    setTimeout(() => game.confusionActive = false, 3000);
+                }
+            },
+            { 
+                id: 'extra_life',
+                name: "❤️ Vie extra", 
+                icon: "➕",
+                description: "Une chance supplémentaire en cas d'erreur",
+                color: "#ff4757",
+                effect: (game) => {
+                    game.extraLife = true;
+                    game.extraLifeTeam = game.activeTeam;
+                }
+            },
+            { 
+                id: 'peek',
+                name: "👀 Coup d'œil", 
+                icon: "👁️",
+                description: "Voir la réponse de l'adversaire",
+                color: "#00b894",
+                effect: (game) => {
+                    const opponentTeam = game.activeTeam === 1 ? game.team2 : game.team1;
+                    UI.showMessage(`L'adversaire a : ${opponentTeam.currentOperation.result}`, 'info');
+                }
+            }
+        ];
+        
+        this.activePowerUps = [];
+        this.spawnChance = 0.15; // 15% de chance par tour
+    }
+    
+    // Choisir un power-up aléatoire
+    getRandomPowerUp() {
+        return this.types[Math.floor(Math.random() * this.types.length)];
+    }
+    
+    // Tenter de générer un power-up
+    trySpawnPowerUp(roundNumber) {
+        // Plus on avance dans les rounds, plus les chances augmentent
+        const chance = this.spawnChance + (roundNumber * 0.05);
+        
+        if (Math.random() < chance) {
+            return this.getRandomPowerUp();
+        }
+        return null;
+    }
+}
+
 // ==================== CLASSE GAME ====================
 class Game {
     constructor() {
@@ -75,6 +193,19 @@ class Game {
         this.timeLeft = 0;
         this.iaTimeout = null;
         this.waitingForAnswer = false;
+
+
+        this.powerUpSystem = new PowerUp();
+        this.pointMultiplier = 1;
+        this.timeFrozen = false;
+        this.shieldActive = false;
+        this.shieldTeam = null;
+        this.extraLife = false;
+        this.extraLifeTeam = null;
+        this.confusionActive = false;
+        this.confusionTeam = null;
+        this.opponentTimeReduced = false;
+        this.timeReduction = 1;
     }
 
     startNewGame(difficulty, mode) {
@@ -96,9 +227,20 @@ class Game {
         this.team1.clearAnswer();
         this.team2.clearAnswer();
         
+        // Réinitialiser certains power-ups
+        this.pointMultiplier = 1;
+        
+        // Générer un power-up aléatoire
+        const powerUp = this.powerUpSystem.trySpawnPowerUp(this.currentRound);
+        if (powerUp) {
+            this.currentPowerUp = powerUp;
+            UI.showPowerUp(powerUp);
+        } else {
+            this.currentPowerUp = null;
+        }
+        
         // Ne générer que la question pour l'équipe active
         this.generateOperation(this.team1);
-        // Cacher la question de l'autre équipe
         this.team2.currentOperation = { text: "À ton tour !", result: null };
         
         this.startTimer();
@@ -222,14 +364,26 @@ class Game {
 
     // Dans la classe Game, remplacez startTimer()
     startTimer() {
-        this.timeLeft = CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit;
+        let timeLimit = CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit;
+        
+        // Appliquer les power-ups qui affectent le temps
+        if (this.timeFrozen) {
+            // Temps gelé, ne pas décrémenter
+            return;
+        }
+        
+        if (this.opponentTimeReduced && this.activeTeam === this.confusionTeam) {
+            timeLimit = Math.floor(timeLimit * this.timeReduction);
+        }
+        
+        this.timeLeft = timeLimit;
         this.maxTime = this.timeLeft;
         this.updateTimerDisplay();
         
         if (this.timer) clearInterval(this.timer);
         
         this.timer = setInterval(() => {
-            if (this.isPaused) return;
+            if (this.isPaused || this.timeFrozen) return;
             
             this.timeLeft--;
             this.updateTimerDisplay();
@@ -238,7 +392,7 @@ class Game {
             if (this.timeLeft <= 0) {
                 this.handleTimeout();
             }
-        }, 1000); // Changé de 100ms à 1000ms (1 seconde)
+        }, 1000);
     }
 
     handleTimeout() {
@@ -281,28 +435,37 @@ class Game {
         
         const currentTeam = this.activeTeam === 1 ? this.team1 : this.team2;
         
-        // Vérifier si une réponse a été saisie
         if (!currentTeam.currentAnswer) {
             UI.showMessage("Entre une réponse d'abord !", 'warning');
             return;
         }
         
-        // Effacer immédiatement l'affichage de la réponse
-        UI.clearAnswerDisplay();
-        
         this.waitingForAnswer = true;
         
+        // Vérifier si un power-up est actif
+        if (this.shieldActive && this.shieldTeam === this.activeTeam) {
+            // Bouclier protège contre les mauvaises réponses
+            this.shieldActive = false;
+            UI.showMessage("🛡️ Bouclier activé ! Protégé contre cette erreur", 'success');
+            this.waitingForAnswer = false;
+            currentTeam.clearAnswer();
+            UI.clearAnswerDisplay();
+            return;
+        }
+        
         if (currentTeam.isCorrect()) {
-            // Bonne réponse
-            UI.showEffect('correct', this.activeTeam);
-            UI.showMessage("Bonne réponse ! 🎉", 'success');
-            this.moveRope(this.activeTeam);
+            // Bonne réponse avec multiplicateur
+            const points = this.pointMultiplier;
+            for (let i = 0; i < points; i++) {
+                this.moveRope(this.activeTeam);
+            }
             
-            // Vérifier si l'équipe a gagné la manche
+            UI.showEffect('correct', this.activeTeam);
+            UI.showMessage(points > 1 ? `Bonne réponse ! x${points} points ! 🎉` : "Bonne réponse ! 🎉", 'success');
+            
             if (Math.abs(this.ropePosition) >= CONFIG.ROPE_STEPS) {
                 this.winRound(this.activeTeam);
             } else {
-                // Passer à l'équipe suivante
                 setTimeout(() => {
                     this.switchTeam();
                     this.prepareNextTurn();
@@ -310,23 +473,31 @@ class Game {
             }
         } else {
             // Mauvaise réponse
-            UI.showEffect('wrong', this.activeTeam);
-            UI.showMessage("Mauvaise réponse ! ❌", 'error');
-            
-            // Déplacer la corde dans l'autre sens
-            const otherTeam = this.activeTeam === 1 ? 2 : 1;
-            this.moveRope(otherTeam);
-            
-            if (Math.abs(this.ropePosition) >= CONFIG.ROPE_STEPS) {
-                this.winRound(otherTeam);
+            if (this.extraLife && this.extraLifeTeam === this.activeTeam) {
+                // Vie extra : ne pas perdre de terrain
+                this.extraLife = false;
+                UI.showMessage("❤️ Vie extra ! Vous ne perdez pas de terrain", 'success');
+                this.waitingForAnswer = false;
+                currentTeam.clearAnswer();
+                UI.clearAnswerDisplay();
+                this.startTimer();
             } else {
-                // L'équipe qui s'est trompée rejoue (elle n'a pas marqué)
-                setTimeout(() => {
-                    this.waitingForAnswer = false;
-                    currentTeam.clearAnswer();
-                    UI.updateQuestion(this.activeTeam, currentTeam.currentOperation.text);
-                    this.startTimer();
-                }, CONFIG.ANIMATION_DURATION);
+                UI.showEffect('wrong', this.activeTeam);
+                UI.showMessage("Mauvaise réponse ! ❌", 'error');
+                
+                const otherTeam = this.activeTeam === 1 ? 2 : 1;
+                this.moveRope(otherTeam);
+                
+                if (Math.abs(this.ropePosition) >= CONFIG.ROPE_STEPS) {
+                    this.winRound(otherTeam);
+                } else {
+                    setTimeout(() => {
+                        this.waitingForAnswer = false;
+                        currentTeam.clearAnswer();
+                        UI.updateQuestion(this.activeTeam, currentTeam.currentOperation.text);
+                        this.startTimer();
+                    }, CONFIG.ANIMATION_DURATION);
+                }
             }
         }
     }
@@ -1191,6 +1362,75 @@ class UI {
         if (this.team1Answer) this.team1Answer.textContent = team1Answer;
         if (this.team2Answer) this.team2Answer.textContent = team2Answer;
     }
+
+    static showPowerUp(powerUp) {
+        // Créer une notification de power-up
+        const powerUpDiv = document.createElement('div');
+        powerUpDiv.className = 'power-up-notification';
+        powerUpDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: ${powerUp.color};
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            font-size: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 3000;
+            animation: powerUpPop 0.5s ease;
+            border: 5px solid gold;
+        `;
+        
+        powerUpDiv.innerHTML = `
+            <div style="font-size: 4rem; margin-bottom: 15px;">${powerUp.icon}</div>
+            <div style="font-weight: bold; margin-bottom: 10px;">${powerUp.name}</div>
+            <div style="font-size: 1rem; opacity: 0.9;">${powerUp.description}</div>
+        `;
+        
+        document.body.appendChild(powerUpDiv);
+        
+        setTimeout(() => {
+            powerUpDiv.style.animation = 'powerUpFadeOut 0.5s ease';
+            setTimeout(() => powerUpDiv.remove(), 500);
+        }, 3000);
+    }
+
+    static updatePowerUpIndicators(game) {
+        // Supprimer les anciens indicateurs
+        document.querySelectorAll('.active-power-up').forEach(el => el.remove());
+        
+        const activePowerUps = [];
+        if (game.pointMultiplier > 1) activePowerUps.push("💪 Double points");
+        if (game.timeFrozen) activePowerUps.push("❄️ Temps gelé");
+        if (game.shieldActive) activePowerUps.push("🛡️ Bouclier");
+        if (game.extraLife) activePowerUps.push("❤️ Vie extra");
+        
+        if (activePowerUps.length > 0) {
+            const indicator = document.createElement('div');
+            indicator.className = 'active-power-up';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 15px;
+                border-radius: 10px;
+                z-index: 2500;
+                border-left: 5px solid gold;
+            `;
+            
+            indicator.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 10px;">✨ Power-ups actifs</div>
+                ${activePowerUps.map(p => `<div style="margin: 5px 0;">${p}</div>`).join('')}
+            `;
+            
+            document.body.appendChild(indicator);
+        }
+    }
 }
 
 // ==================== INITIALISATION ====================
@@ -1234,6 +1474,17 @@ document.addEventListener('DOMContentLoaded', () => {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
+        }
+
+        @keyframes powerUpPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            80% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        @keyframes powerUpFadeOut {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
         }
     `;
     document.head.appendChild(style);
