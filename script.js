@@ -256,6 +256,9 @@ class Game {
 
     prepareNextTurn() {
         this.waitingForAnswer = false;
+        // Réinitialiser les réponses des deux équipes
+        this.team1.clearAnswer();
+        this.team2.clearAnswer();
         const currentTeam = this.activeTeam === 1 ? this.team1 : this.team2;
         
         if (this.gameMode === 'pvp' || (this.gameMode === 'pvai' && this.activeTeam === 1)) {
@@ -263,7 +266,6 @@ class Game {
             this.generateOperation(currentTeam);
             UI.updateQuestion(this.activeTeam, currentTeam.currentOperation.text);
             UI.updateQuestion(this.activeTeam === 1 ? 2 : 1, "À ton tour !");
-            UI.clearAnswerDisplay();
             this.startTimer();
         } else if (this.gameMode === 'pvai' && this.activeTeam === 2) {
             // Pour l'IA
@@ -284,6 +286,9 @@ class Game {
             UI.showMessage("Entre une réponse d'abord !", 'warning');
             return;
         }
+        
+        // Effacer immédiatement l'affichage de la réponse
+        UI.clearAnswerDisplay();
         
         this.waitingForAnswer = true;
         
@@ -319,7 +324,7 @@ class Game {
                 setTimeout(() => {
                     this.waitingForAnswer = false;
                     currentTeam.clearAnswer();
-                    UI.clearAnswerDisplay();
+                    UI.updateQuestion(this.activeTeam, currentTeam.currentOperation.text);
                     this.startTimer();
                 }, CONFIG.ANIMATION_DURATION);
             }
