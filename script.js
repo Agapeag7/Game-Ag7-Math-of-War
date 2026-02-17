@@ -399,7 +399,14 @@ class Game {
                     const originalResult = advTeam.currentOperation.result;
                     const newOp = this.generateConfusingOperation(originalResult);
                     advTeam.currentOperation = newOp;
+                    advTeam.clearAnswer(); // Efface la réponse en cours
                     UI.updateQuestion(opponent, newOp.text);
+                    // Met à jour l'affichage de la réponse (remet "?")
+                    if (opponent === 1) {
+                        if (UI.team1Answer) UI.team1Answer.textContent = '?';
+                    } else {
+                        if (UI.team2Answer) UI.team2Answer.textContent = '?';
+                    }
                     UI.showMessage(`🌀 Confusion ! La question de l'adversaire a changé !`, 'success');
                 }
                 break;
@@ -1380,10 +1387,16 @@ class UI {
         Object.values(this.screens).forEach(screen => {
             if (screen) screen.classList.remove('active');
         });
-        
+
         if (this.screens[screenName]) {
             this.screens[screenName].classList.add('active');
         }
+
+        // Afficher ou cacher les panneaux de bonus selon l'écran
+        const isGameScreen = (screenName === 'game');
+        if (this.bonusLeft) this.bonusLeft.style.display = isGameScreen ? 'flex' : 'none';
+        if (this.bonusRight) this.bonusRight.style.display = isGameScreen ? 'flex' : 'none';
+        // Ne rien faire pour attemptsContainer – il est dans l'écran de jeu
     }
 
     // Dans UI.showTurnIndicator(), ajoutez :
@@ -1902,7 +1915,6 @@ class UI {
 
     static updateAttempts() {
         if (!game) return;
-        
         const attempts1 = document.getElementById('attempts-1');
         const attempts2 = document.getElementById('attempts-2');
         
@@ -1920,35 +1932,30 @@ class UI {
     }
 
     static setupBonusUI() {
-        // Supprimer les anciens conteneurs s'ils existent
-        const oldLeft = document.getElementById('bonus-left');
-        if (oldLeft) oldLeft.remove();
-        const oldRight = document.getElementById('bonus-right');
-        if (oldRight) oldRight.remove();
-        const oldAttempts = document.getElementById('attempts-display');
-        if (oldAttempts) oldAttempts.remove();
+        // Créer le panneau gauche pour l'équipe 1 (s'il n'existe pas)
+        if (!document.getElementById('bonus-left')) {
+            const leftBonus = document.createElement('div');
+            leftBonus.id = 'bonus-left';
+            leftBonus.className = 'bonus-side left';
+            leftBonus.dataset.team = '🔴 Équipe Rouge';
+            leftBonus.style.display = 'none'; // Caché par défaut
+            document.body.appendChild(leftBonus);
+            this.bonusLeft = leftBonus;
+        }
+        // Créer le panneau droit pour l'équipe 2 (s'il n'existe pas)
+        if (!document.getElementById('bonus-right')) {
+            const rightBonus = document.createElement('div');
+            rightBonus.id = 'bonus-right';
+            rightBonus.className = 'bonus-side right';
+            rightBonus.dataset.team = '🔵 Équipe Bleue';
+            rightBonus.style.display = 'none';
+            document.body.appendChild(rightBonus);
+            this.bonusRight = rightBonus;
+        }
 
-        // Créer les nouveaux conteneurs fixés
-        const leftBonus = document.createElement('div');
-        leftBonus.id = 'bonus-left';
-        leftBonus.className = 'bonus-side left';
-        leftBonus.dataset.team = '🔴 Équipe Rouge';
-        document.body.appendChild(leftBonus);
-
-        const rightBonus = document.createElement('div');
-        rightBonus.id = 'bonus-right';
-        rightBonus.className = 'bonus-side right';
-        rightBonus.dataset.team = '🔵 Équipe Bleue';
-        document.body.appendChild(rightBonus);
-
-        const attemptsDisplay = document.createElement('div');
-        attemptsDisplay.id = 'attempts-display';
-        attemptsDisplay.className = 'attempts-display';
-        attemptsDisplay.innerHTML = `
-            <span class="attempts-team1">🔴 <span id="attempts-1">3</span></span>
-            <span class="attempts-team2">🔵 <span id="attempts-2">3</span></span>
-        `;
-        document.body.appendChild(attemptsDisplay);
+        // NE PAS créer attempts-display – on utilise le HTML existant
+        // On garde une référence vers le conteneur des tentatives si besoin (optionnel)
+        this.attemptsContainer = document.querySelector('.attempts-compact');
     }
 
     static playSound(type) {
@@ -2092,11 +2099,15 @@ class UI {
                 transform: scale(0.95);
             }
             
-            .bonus-emoji { font-size: 1.8rem; line-height: 1; }
+            .bonus-emoji { font-size: 1.8rem; }
             
             .bonus-counter {
-                background: gold; color: black; font-weight: bold;
-                padding: 2px 8px; border-radius: 20px; margin-left: auto;
+                background: gold;
+                color: black;
+                font-weight: bold;
+                padding: 2px 8px;
+                border-radius: 20px;
+                margin-left: auto;
             }
                         
             .no-bonus-message {
@@ -2125,7 +2136,11 @@ class UI {
             }
             
             .attempts-team1 span, .attempts-team2 span {
-                background: white; color: black; padding: 5px 15px; border-radius: 30px; margin-left: 8px;
+                background: white;
+                color: black;
+                padding: 5px 15px;
+                border-radius: 30px;
+                margin-left: 8px;
             }
 
             .game-container {
@@ -2134,7 +2149,7 @@ class UI {
 
             .bonus-side {
                 position: fixed;
-                top: 120px; /* Ajustez selon la hauteur de votre header */
+                top: 120px;
                 width: 160px;
                 background: rgba(0, 0, 0, 0.6);
                 backdrop-filter: blur(8px);
@@ -2152,7 +2167,6 @@ class UI {
             .bonus-side.left { left: 10px; }
             .bonus-side.right { right: 10px; }
 
-            /* Titre de l'équipe dans le panneau */
             .bonus-side::before {
                 content: attr(data-team);
                 display: block;
@@ -2160,18 +2174,14 @@ class UI {
                 font-weight: bold;
                 font-size: 1.2rem;
                 margin-bottom: 10px;
-                color: white;
-                text-shadow: 0 2px 4px black;
             }
 
-            /* Conteneur des icônes en colonne */
             .bonus-side .bonus-icons {
                 display: flex;
                 flex-direction: column;
                 gap: 8px;
             }
 
-            /* Icônes de bonus */
             .bonus-side .bonus-icon-item {
                 display: flex;
                 align-items: center;
