@@ -900,6 +900,16 @@ body {
     font-size: 1.2rem;
 }
 
+.bonus-bar {
+    position: relative;
+    z-index: 100;
+}
+
+.bonus-icons {
+    position: relative;
+    z-index: 101;
+}
+
 .bonus-list {
     min-height: 100px;
     max-height: 200px;

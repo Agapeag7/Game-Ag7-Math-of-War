@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AG7 Mind Clash - Jeu de tir à la corde mathématique</title>
     
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;">
+    
     <!-- Google Fonts pour une typographie améliorée -->
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     
@@ -16,7 +18,7 @@
     
     <!-- Hover.css pour des effets de bouton sophistiqués -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css"/>
-    
+
     <!-- Votre CSS existant -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -46,9 +48,9 @@
                 <div class="settings-panel animate__animated animate__fadeInUp animate__delay-1s">
                     <!-- Sélecteur de difficulté avec icônes -->
                     <div class="setting-group">
-                        <label><i class="fas fa-chart-line"></i> Niveau de difficulté</label>
+                        <label for="difficulty-1"><i class="fas fa-chart-line"></i> Niveau de difficulté</label>
                         <div class="difficulty-cards">
-                            <div class="difficulty-card" data-difficulty="1">
+                            <div class="difficulty-card" data-difficulty="1" id="difficulty-1">
                                 <div class="card-icon">🌱</div>
                                 <div class="card-title">Débutant</div>
                                 <div class="card-desc">Additions 0-10</div>
@@ -164,11 +166,8 @@
             </div>
 
             <div class="bonus-bar">
-                <div class="bonus-toggle" id="bonus-toggle">
-                    <i class="fas fa-gift"></i> Bonus <span id="bonus-count">0</span>
-                </div>
-                <div class="bonus-dropdown" id="bonus-dropdown" style="display: none;">
-                    <div class="bonus-list-compact" id="bonus-list"></div>
+                <div class="bonus-icons" id="bonus-icons">
+                    <!-- Les icônes seront générées ici -->
                 </div>
                 <div class="attempts-compact">
                     <span class="attempts-team1">🔴 <span id="attempts-1">3</span></span>
