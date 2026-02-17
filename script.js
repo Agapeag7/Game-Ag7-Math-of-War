@@ -244,10 +244,11 @@ class Game {
         // Effets programmés à appliquer au tour de l'adversaire
         this.pendingConfusions = []; // { target: teamNumber, ghostOp: {text,result}, originalOp }
         this.pendingTimeSteals = []; // { target: teamNumber, amount: seconds }
+        this.activeGhosts = {}; // active ghost per team: { ghostOp, originalOp }
         
         // Tentatives (UNIFIÉES)
-        this.attempts = { 1: 3, 2: 3 };
-        this.maxAttempts = 3;
+        this.attempts = { 1: 2, 2: 2 };
+        this.maxAttempts = 2;
 
         this.bonusInventories = {
             1: {
@@ -420,6 +421,9 @@ class Game {
                 this.bonusInventories[team][key].count = 0;
             }
         }
+        // Réinitialiser les tentatives pour les deux équipes
+        this.attempts = { 1: this.maxAttempts, 2: this.maxAttempts };
+        UI.updateAttempts();
         
         // Mettre à jour l'affichage
         UI.updateBonusIcons(this.bonusInventories);
@@ -714,6 +718,8 @@ class Game {
                 // On affiche l'illusion après 1 seconde
                 setTimeout(() => {
                     UI.updateQuestion(this.activeTeam, conf.ghostOp.text);
+                    // Marquer le ghost comme actif (pour que l'IA puisse s'y faire piéger)
+                    this.activeGhosts[this.activeTeam] = { ghostOp: conf.ghostOp, originalOp: conf.originalOp };
                     UI.showMessage('🌀 Illusion affichée : attention à la vraie question !', 'warning');
                 }, 1000);
             }
@@ -783,6 +789,7 @@ class Game {
                 const conf = this.pendingConfusions.splice(confForIAIdx, 1)[0];
                 setTimeout(() => {
                     UI.updateQuestion(2, conf.ghostOp.text);
+                    this.activeGhosts[2] = { ghostOp: conf.ghostOp, originalOp: conf.originalOp };
                     UI.showMessage('🌀 Illusion affichée pour l\'IA (ne change pas la vraie réponse)', 'warning');
                 }, 1000);
             }
@@ -1077,8 +1084,49 @@ class Game {
         }
         
         // Décision de l'IA (basée sur le taux d'erreur)
+        // Si une illusion active existe pour l'IA, il y a une chance qu'elle réponde selon l'illusion (se faire piéger)
+        const activeGhost = this.activeGhosts[2];
+        let fallenForGhost = false;
+        if (activeGhost) {
+            // chance de se faire piéger décroissante selon la difficulté
+            const baseChance = 0.7 - ((this.currentDifficulty - 1) * 0.05);
+            const ghostFallChance = Math.max(0.2, Math.min(0.9, baseChance));
+            if (Math.random() < ghostFallChance) {
+                fallenForGhost = true;
+            }
+        }
+
         const shouldBeWrong = Math.random() < CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].aiErrorRate;
-        
+
+        if (fallenForGhost) {
+            // L'IA répond selon la question fantôme (généralement incorrecte)
+            const ghostAnswer = activeGhost.ghostOp.result;
+            currentTeam.setAnswer(ghostAnswer.toString());
+            UI.showMessage("L'IA s'est fait piéger par l'illusion !", 'error');
+            // L'IA utilise une tentative
+            this.attempts[2]--;
+            UI.updateAttempts();
+
+            // Nettoyer le ghost actif
+            delete this.activeGhosts[2];
+
+            if (this.attempts[2] > 0) {
+                setTimeout(() => {
+                    this.waitingForAnswer = false;
+                    currentTeam.clearAnswer();
+                    UI.clearAnswerDisplay();
+                    this.startIA();
+                }, CONFIG.ANIMATION_DURATION);
+            } else {
+                // Plus de tentatives
+                this.moveRope(1);
+                this.attempts[2] = this.maxAttempts;
+                this.switchTeam();
+                this.prepareNextTurn();
+            }
+            return;
+        }
+
         if (shouldBeWrong) {
             // L'IA fait une erreur
             const wrongAnswer = currentTeam.currentOperation.result + Math.floor(Math.random() * 5) + 1;
@@ -1109,7 +1157,8 @@ class Game {
             // L'IA répond correctement
             currentTeam.setAnswer(currentTeam.currentOperation.result.toString());
             UI.showMessage("L'IA a trouvé la réponse !", 'success');
-            
+            // Nettoyer un éventuel ghost (si présent mais non tombé)
+            if (this.activeGhosts[2]) delete this.activeGhosts[2];
             // Traiter la bonne réponse (qui gère déjà les tentatives)
             this.handleAnswer();
         }
@@ -1158,16 +1207,54 @@ class Game {
     }
 
     tryUseBonusIA() {
-        // L'IA (team 2) examine son inventaire et utilise un bonus aléatoirement parmi ceux utilisables pendant son tour
+        // L'IA (team 2) examine son inventaire et choisit un bonus de manière heuristique
         const inventory = this.bonusInventories[2];
-        const usableOutOfTurn = ['confusion', 'steal_attempt'];
-        const available = Object.entries(inventory).filter(([id, b]) => 
-            b.count > 0 && !usableOutOfTurn.includes(id)
-        );
+        const available = Object.entries(inventory).filter(([id, b]) => b.count > 0);
         if (available.length === 0) return;
 
-        const [bonusId] = available[Math.floor(Math.random() * available.length)];
-        this.useBonus(bonusId, 2, true);
+        // Scoring des bonus selon contexte
+        const scores = available.map(([id, b]) => {
+            let score = 0;
+            // Favoriser double points si l'IA est susceptible de répondre correctement or proche de gagner
+            if (id === 'double_points') {
+                const willBeCorrect = Math.random() >= CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].aiErrorRate;
+                if (willBeCorrect) score += 30;
+                if (Math.abs(this.ropePosition) >= CONFIG.ROPE_STEPS - 2 && this.ropePosition > 0) score += 40; // push to win
+            }
+            if (id === 'extra_attempt') {
+                if (this.attempts[2] <= 1) score += 40;
+                else score += 5;
+            }
+            if (id === 'shield') {
+                if (this.attempts[2] <= 1) score += 30;
+            }
+            if (id === 'steal_attempt') {
+                // Useful if opponent has time remaining
+                const oppTime = typeof this.timeLeft === 'number' && this.activeTeam === 1 ? this.timeLeft : (CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit);
+                if (oppTime > 5) score += 25;
+            }
+            if (id === 'time_bonus') {
+                if (this.timeLeft <= 5) score += 20;
+            }
+            if (id === 'confusion') {
+                // Useful if opponent has an operation and some time/attempts
+                const opp = this.team1;
+                if (opp.currentOperation && opp.currentOperation.result !== null) {
+                    score += 25;
+                    if (this.attempts[1] >= 2) score += 10;
+                }
+            }
+
+            // Small randomness
+            score += Math.random() * 10;
+            return { id, score };
+        });
+
+        // Choisir le meilleur score (probabilistic choice)
+        scores.sort((a,b) => b.score - a.score);
+        const chosen = scores[0].id;
+        // Utiliser le bonus choisi
+        this.useBonus(chosen, 2, true);
     }
 
     AIUseOutOfTurnBonuses() {

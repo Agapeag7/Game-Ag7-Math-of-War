@@ -28,7 +28,7 @@
 4. Saisissez votre réponse à l'opération affichée à l'aide du **pavé numérique**.
 5. Validez avec le bouton **✔** ou la touche **Entrée**.
 6. Si la réponse est correcte, la corde se déplace vers votre camp. Vous pouvez obtenir un bonus aléatoire.
-7. Si la réponse est incorrecte, vous perdez une tentative. Après trois mauvaises réponses, la corde avance vers l'adversaire.
+7. Si la réponse est incorrecte, vous perdez une tentative. Après deux mauvaises réponses, la corde avance vers l'adversaire.
 8. La première équipe qui remporte **3 manches** gagne la partie.
 
 ### Utilisation des bonus
@@ -86,16 +86,15 @@ Aucune installation supplémentaire ni connexion internet n'est requise (les pol
 | Double points | Prochaine bonne réponse = 2 points. |
 | Tentative sup | Gagne une tentative supplémentaire. |
 | Bouclier     | Protège contre une erreur. |
-| Vol de temps  | Retire 5 secondes au chrono de l'adversaire. (utilisable pendant le tour adverse) |
+| Vol de temps  | Retire 5 secondes au chrono de l'adversaire. (s'utilise pendant votre tour ; l'effet est appliqué au tour adverse) |
 | Temps bonus   | Ajoute 5 secondes à son propre chrono. |
-| Confusion      | Change la question de l'adversaire (même résultat). (utilisable pendant le tour adverse) |
+| Confusion      | Change la question de l'adversaire (même résultat). (s'utilise pendant votre tour ; l'illusion est affichée au tour adverse) |
 
 ### Intelligence Artificielle (mode Joueur vs IA)
 - L'IA répond après un délai dépendant du niveau de difficulté.
 - Elle peut commettre des erreurs (taux d'erreur configurable).
 - **L'IA utilise ses propres bonus** :
-  - Pendant son tour : double points, tentative supplémentaire, bouclier, temps bonus.
-  - Pendant le tour du joueur : confusion et vol de temps (avec une probabilité).
+  - Pendant son tour : double points, tentative supplémentaire, bouclier, temps bonus, confusion et vol de temps (l'IA les active pendant son tour et leurs effets sont appliqués au tour adverse).
 
 ---
 
