@@ -83,12 +83,12 @@ Aucune installation supplémentaire ni connexion internet n'est requise (les pol
 ### Bonus d'inventaire (obtenus après une bonne réponse)
 | Bonus            | Effet (utilisable pendant son tour sauf mention) |
 |------------------|--------------------------------------------------|
-| 💪 Double points | Prochaine bonne réponse = 2 points. |
-| ➕ Tentative sup | Gagne une tentative supplémentaire. |
-| 🛡️ Bouclier     | Protège contre une erreur. |
-| ⏱️ Vol de temps  | Retire 5 secondes au chrono de l'adversaire. (utilisable pendant le tour adverse) |
-| ⏱️ Temps bonus   | Ajoute 5 secondes à son propre chrono. |
-| 🌀 Confusion      | Change la question de l'adversaire (même résultat). (utilisable pendant le tour adverse) |
+| Double points | Prochaine bonne réponse = 2 points. |
+| Tentative sup | Gagne une tentative supplémentaire. |
+| Bouclier     | Protège contre une erreur. |
+| Vol de temps  | Retire 5 secondes au chrono de l'adversaire. (utilisable pendant le tour adverse) |
+| Temps bonus   | Ajoute 5 secondes à son propre chrono. |
+| Confusion      | Change la question de l'adversaire (même résultat). (utilisable pendant le tour adverse) |
 
 ### Intelligence Artificielle (mode Joueur vs IA)
 - L'IA répond après un délai dépendant du niveau de difficulté.
@@ -131,4 +131,3 @@ N'hésitez pas à contribuer ou à signaler des bugs.
 ## Licence
 
 Ce projet est libre d'utilisation pour un usage personnel et éducatif. Toute commercialisation nécessite l'accord des auteurs.
-```
