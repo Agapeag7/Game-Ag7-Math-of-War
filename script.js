@@ -246,13 +246,23 @@ class Game {
         this.attempts = { 1: 3, 2: 3 };
         this.maxAttempts = 3;
 
-        this.bonusInventory = {
-            double_points: { count: 0, name: "💪 Double points", icon: "⭐", color: "#ffd700" },
-            extra_attempt: { count: 0, name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
-            shield: { count: 0, name: "🛡️ Bouclier", icon: "🛡️", color: "#0984e3" },
-            steal_attempt: { count: 0, name: "👻 Voleur", icon: "👻", color: "#6c5ce7" },
-            time_bonus: { count: 0, name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
-            confusion: { count: 0, name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
+        this.bonusInventories = {
+            1: {
+                double_points: { count: 0, name: "💪 Double points", icon: "⭐", color: "#ffd700" },
+                extra_attempt: { count: 0, name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
+                shield: { count: 0, name: "🛡️ Bouclier", icon: "🛡️", color: "#0984e3" },
+                steal_attempt: { count: 0, name: "👻 Voleur", icon: "👻", color: "#6c5ce7" },
+                time_bonus: { count: 0, name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
+                confusion: { count: 0, name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
+            },
+            2: {
+                double_points: { count: 0, name: "💪 Double points", icon: "⭐", color: "#ffd700" },
+                extra_attempt: { count: 0, name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
+                shield: { count: 0, name: "🛡️ Bouclier", icon: "🛡️", color: "#0984e3" },
+                steal_attempt: { count: 0, name: "👻 Voleur", icon: "👻", color: "#6c5ce7" },
+                time_bonus: { count: 0, name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
+                confusion: { count: 0, name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
+            }
         };
 
         this.bonusTypes = [
@@ -304,8 +314,8 @@ class Game {
         };
     }
 
-    tryAddBonus() {
-        if (Math.random() < 0.4) { // 40% de chance
+    tryAddBonus(team) {
+        if (Math.random() < 0.4) {
             const bonusTypes = [
                 { id: 'double_points', name: "💪 Double points", icon: "⭐", color: "#ffd700" },
                 { id: 'extra_attempt', name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
@@ -314,11 +324,10 @@ class Game {
                 { id: 'time_bonus', name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
                 { id: 'confusion', name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
             ];
-            
             const randomBonus = bonusTypes[Math.floor(Math.random() * bonusTypes.length)];
-            this.bonusInventory[randomBonus.id].count++;
-            UI.updateBonusIcons(this.bonusInventory);
-            UI.showMessage(`✨ Bonus obtenu : ${randomBonus.name} !`, 'success');
+            this.bonusInventories[team][randomBonus.id].count++;
+            UI.updateBonusIcons(this.bonusInventories); // transmettre les deux inventaires
+            UI.showMessage(`✨ Bonus obtenu pour ${team === 1 ? 'Équipe Rouge' : 'Équipe Bleue'} : ${randomBonus.name} !`, 'success');
         }
     }
 
@@ -329,33 +338,30 @@ class Game {
             return;
         }
         
-        const bonus = this.bonusInventory[bonusId];
+        const team = this.activeTeam;
+        const bonus = this.bonusInventories[team][bonusId];
         if (!bonus || bonus.count <= 0) return;
         
-        // Actions des bonus
         switch(bonusId) {
             case 'double_points':
                 this.pointMultiplier = 2;
                 UI.showMessage("💪 Double points activé !", 'success');
                 break;
-                
             case 'extra_attempt':
-                this.attempts[this.activeTeam]++;
+                this.attempts[team]++;
                 UI.updateAttempts();
                 UI.showMessage("➕ Tentative supplémentaire !", 'success');
                 break;
-                
             case 'shield':
                 this.shieldActive = true;
-                this.shieldTeam = this.activeTeam;
+                this.shieldTeam = team;
                 UI.showMessage("🛡️ Bouclier activé !", 'success');
                 break;
-                
             case 'steal_attempt':
-                const opponent = this.activeTeam === 1 ? 2 : 1;
+                const opponent = team === 1 ? 2 : 1;
                 if (this.attempts[opponent] > 0) {
                     this.attempts[opponent]--;
-                    this.attempts[this.activeTeam]++;
+                    this.attempts[team]++;
                     UI.updateAttempts();
                     UI.showMessage(`👻 Tentative volée à l'adversaire !`, 'success');
                 } else {
@@ -363,15 +369,13 @@ class Game {
                     return;
                 }
                 break;
-                
             case 'time_bonus':
                 this.timeLeft += 5;
                 this.updateTimerDisplay();
                 UI.showMessage("⏱️ +5 secondes !", 'success');
                 break;
-                
             case 'confusion':
-                const opponent2 = this.activeTeam === 1 ? 2 : 1;
+                const opponent2 = team === 1 ? 2 : 1;
                 if (this.attempts[opponent2] > 0) {
                     this.attempts[opponent2]--;
                     UI.updateAttempts();
@@ -381,14 +385,13 @@ class Game {
                     return;
                 }
                 break;
-                
             default:
                 return;
         }
         
-        // Décrémenter le compteur et mettre à jour l'affichage
+        // Décrémenter le compteur du bonus pour cette équipe
         bonus.count--;
-        UI.updateBonusIcons(this.bonusInventory);
+        UI.updateBonusIcons(this.bonusInventories);
     }
 
     testClick() {
@@ -405,12 +408,14 @@ class Game {
         this.team2.reset();
         
         // Réinitialiser les bonus
-        for (let key in this.bonusInventory) {
-            this.bonusInventory[key].count = 0;
+        for (let team in this.bonusInventories) {
+            for (let key in this.bonusInventories[team]) {
+                this.bonusInventories[team][key].count = 0;
+            }
         }
         
         // Mettre à jour l'affichage
-        UI.updateBonusIcons(this.bonusInventory);
+        UI.updateBonusIcons(this.bonusInventories);
         UI.updateScores();
         UI.updateRounds(this.currentRound, CONFIG.MAX_ROUNDS);
         
@@ -428,7 +433,7 @@ class Game {
         this.pointMultiplier = 1;
         
         // Mettre à jour l'affichage des bonus
-        UI.updateBonusIcons(this.bonusInventory);
+        UI.updateBonusIcons(this.bonusInventories);
         
         // Vérifier si la corde est en position critique (pour plus de chances)
         const isCritical = Math.abs(this.ropePosition) > CONFIG.ROPE_STEPS * 0.7;
@@ -685,7 +690,7 @@ class Game {
             UI.playSound('correct');
             
             // Récompenser avec un bonus (40%)
-            this.tryAddBonus();
+            this.tryAddBonus(this.activeTeam);
             
             // Déplacer la corde (avec multiplicateur)
             const points = this.pointMultiplier || 1;
@@ -1014,8 +1019,8 @@ class Game {
 
     testAddBonus() {
         const testBonus = { id: 'double_points', name: "💪 Double points", icon: "⭐", color: "#ffd700" };
-        this.bonusInventory[testBonus.id].count++;
-        UI.updateBonusIcons(this.bonusInventory); // CORRECTION : utiliser updateBonusIcons
+        this.bonusInventories[this.activeTeam][testBonus.id].count++;
+        UI.updateBonusIcons(this.bonusInventories);// CORRECTION : utiliser updateBonusIcons
         UI.showMessage(`✨ Bonus de test ajouté !`, 'success');
     }
 }
@@ -1817,8 +1822,13 @@ class UI {
                 const bonusBar = document.createElement('div');
                 bonusBar.className = 'bonus-bar';
                 bonusBar.innerHTML = `
-                    <div class="bonus-icons" id="bonus-icons">
-                        <span class="no-bonus-message">🎁</span>
+                    <div class="bonus-section team1-bonus">
+                        <div class="bonus-label">🔴 Bonus Rouge</div>
+                        <div class="bonus-icons" id="team1-bonus-icons"></div>
+                    </div>
+                    <div class="bonus-section team2-bonus">
+                        <div class="bonus-label">🔵 Bonus Bleu</div>
+                        <div class="bonus-icons" id="team2-bonus-icons"></div>
                     </div>
                     <div class="attempts-compact">
                         <span class="attempts-team1">🔴 <span id="attempts-1">3</span></span>
@@ -1857,11 +1867,17 @@ class UI {
         } catch(e) { /* Silently fail if AudioContext not supported */ }
     }
 
-    static updateBonusIcons(bonusInventory) {
-        const container = document.getElementById('bonus-icons');
-        if (!container) return;
+    static updateBonusIcons(inventories) {
+        const team1Container = document.getElementById('team1-bonus-icons');
+        const team2Container = document.getElementById('team2-bonus-icons');
         
-        const activeBonuses = Object.entries(bonusInventory).filter(([_, bonus]) => bonus.count > 0);
+        this.renderBonusIconsForTeam(team1Container, inventories[1], 1);
+        this.renderBonusIconsForTeam(team2Container, inventories[2], 2);
+    }
+
+    static renderBonusIconsForTeam(container, inventory, team) {
+        if (!container) return;
+        const activeBonuses = Object.entries(inventory).filter(([_, bonus]) => bonus.count > 0);
         
         if (activeBonuses.length === 0) {
             container.innerHTML = '<span class="no-bonus-message">🎁</span>';
@@ -1869,7 +1885,7 @@ class UI {
         }
         
         container.innerHTML = activeBonuses.map(([id, bonus]) => `
-            <div class="bonus-icon-item" data-bonus-id="${id}" title="${bonus.name} - Cliquez pour activer">
+            <div class="bonus-icon-item" data-bonus-id="${id}" data-team="${team}" title="${bonus.name} - Cliquez pour activer">
                 <span class="bonus-emoji" style="color: ${bonus.color};">${bonus.icon}</span>
                 <span class="bonus-counter" style="background: ${bonus.color};">${bonus.count}</span>
             </div>
@@ -1879,8 +1895,11 @@ class UI {
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const bonusId = item.dataset.bonusId;
-                if (game) {                        // ← remplacer window.game par game
+                const teamId = parseInt(item.dataset.team);
+                if (game && game.activeTeam === teamId) {
                     game.useBonus(bonusId);
+                } else {
+                    UI.showMessage("Ce n'est pas le moment d'utiliser ce bonus !", 'warning');
                 }
             });
         });
@@ -1904,14 +1923,42 @@ class UI {
                 border: 1px solid rgba(255, 255, 255, 0.2);
                 width: 100%;
                 box-sizing: border-box;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .bonus-section {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background: rgba(0, 0, 0, 0.2);
+                padding: 5px 15px;
+                border-radius: 40px;
+                min-width: 150px;
+            }
+
+            .team1-bonus {
+                border-left: 4px solid var(--team1-color);
+            }
+
+            .team2-bonus {
+                border-left: 4px solid var(--team2-color);
+            }
+
+            .bonus-label {
+                font-size: 0.9rem;
+                font-weight: bold;
+                color: white;
+                margin-bottom: 5px;
             }
             
             .bonus-icons {
                 display: flex;
                 flex-direction: row;
-                gap: 12px;
+                gap: 8px;
                 align-items: center;
                 flex-wrap: wrap;
+                justify-content: center;
             }
             
             .bonus-icon-item {
