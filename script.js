@@ -241,6 +241,9 @@ class Game {
         this.opponentTimeReduced = false;
         this.timeReduction = 1;
         this.timeReductionUntil = 0;
+        // Effets programmés à appliquer au tour de l'adversaire
+        this.pendingConfusions = []; // { target: teamNumber, ghostOp: {text,result}, originalOp }
+        this.pendingTimeSteals = []; // { target: teamNumber, amount: seconds }
         
         // Tentatives (UNIFIÉES)
         this.attempts = { 1: 3, 2: 3 };
@@ -335,23 +338,12 @@ class Game {
         const bonus = this.bonusInventories[team][bonusId];
         if (!bonus || bonus.count <= 0) return;
 
-        const usableOutOfTurn = ['confusion', 'steal_attempt'];
-
-        // Vérification pour les joueurs humains (non IA)
+        // Tous les bonus doivent être activés pendant le tour du joueur qui les possède (sauf IA flag pour tests)
         if (!isIA) {
             const isPlayerTurn = (this.activeTeam === team);
-            if (usableOutOfTurn.includes(bonusId)) {
-                // Ces bonus ne peuvent être utilisés que pendant le tour adverse
-                if (isPlayerTurn) {
-                    UI.showMessage("Ce bonus ne peut être utilisé que pendant le tour adverse !", 'warning');
-                    return;
-                }
-            } else {
-                // Bonus normaux : seulement pendant son propre tour
-                if (!isPlayerTurn) {
-                    UI.showMessage("Ce n'est pas le moment d'utiliser ce bonus !", 'warning');
-                    return;
-                }
+            if (!isPlayerTurn) {
+                UI.showMessage("Ce n'est pas le moment d'utiliser ce bonus !", 'warning');
+                return;
             }
         }
 
@@ -376,15 +368,9 @@ class Game {
                 break;
 
             case 'steal_attempt': // Vol de temps
-                if (this.timeLeft > 0) {
-                    this.timeLeft = Math.max(0, this.timeLeft - 5);
-                    this.updateTimerDisplay();
-                    UI.updateTimerBar(this.timeLeft, this.maxTime);
-                    UI.showMessage(`⏱️ Vol de temps : -5s pour l'adversaire !`, 'success');
-                } else {
-                    UI.showMessage("L'adversaire n'a plus de temps !", 'warning');
-                    return;
-                }
+                // Programmer le vol de temps pour l'adversaire au début de son prochain tour
+                this.pendingTimeSteals.push({ target: opponent, amount: 5, from: team });
+                UI.showMessage(`⏱️ Vol de temps programmé pour l'adversaire (-5s) !`, 'success');
                 break;
 
             case 'time_bonus':
@@ -398,16 +384,11 @@ class Game {
                 if (advTeam.currentOperation && advTeam.currentOperation.result !== null) {
                     const originalResult = advTeam.currentOperation.result;
                     const newOp = this.generateConfusingOperation(originalResult);
-                    advTeam.currentOperation = newOp;
-                    advTeam.clearAnswer(); // Efface la réponse en cours
-                    UI.updateQuestion(opponent, newOp.text);
-                    // Met à jour l'affichage de la réponse (remet "?")
-                    if (opponent === 1) {
-                        if (UI.team1Answer) UI.team1Answer.textContent = '?';
-                    } else {
-                        if (UI.team2Answer) UI.team2Answer.textContent = '?';
-                    }
-                    UI.showMessage(`🌀 Confusion ! La question de l'adversaire a changé !`, 'success');
+                    // Ne pas remplacer l'opération réelle : stocker l'illusion pour le prochain tour de l'adversaire
+                    this.pendingConfusions.push({ target: opponent, ghostOp: newOp, originalOp: { ...advTeam.currentOperation } });
+                    UI.showMessage(`🌀 Confusion programmée pour l'adversaire (illusion stockée) !`, 'success');
+                } else {
+                    UI.showMessage("Impossible de perturber : l'adversaire n'a pas d'opération active.", 'warning');
                 }
                 break;
             }
@@ -642,32 +623,37 @@ class Game {
     }
 
     // Dans la classe Game, remplacez startTimer()
-    startTimer() {
+    // reset: if true (default) set timeLeft to difficulty limit, otherwise resume from existing this.timeLeft
+    startTimer(reset = true) {
         let timeLimit = CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit;
         
-        // Appliquer les power-ups qui affectent le temps
+        // Si le temps est gelé, ne pas démarrer
         if (this.timeFrozen) {
-            // Temps gelé, ne pas décrémenter
             return;
         }
-        
+
+        // Appliquer réduction de temps au moment de l'initialisation seulement
         if (this.opponentTimeReduced && this.activeTeam === this.confusionTeam) {
             timeLimit = Math.floor(timeLimit * this.timeReduction);
         }
-        
-        this.timeLeft = timeLimit;
-        this.maxTime = this.timeLeft;
+
+        if (reset || typeof this.timeLeft === 'undefined' || this.timeLeft <= 0) {
+            this.timeLeft = timeLimit;
+        }
+
+        // maxTime représente la durée initiale pour la barre
+        this.maxTime = timeLimit;
         this.updateTimerDisplay();
-        
+
         if (this.timer) clearInterval(this.timer);
-        
+
         this.timer = setInterval(() => {
             if (this.isPaused || this.timeFrozen) return;
-            
+
             this.timeLeft--;
             this.updateTimerDisplay();
             UI.updateTimerBar(this.timeLeft, this.maxTime);
-            
+
             if (this.timeLeft <= 0) {
                 this.handleTimeout();
             }
@@ -718,6 +704,20 @@ class Game {
             UI.updateQuestion(this.activeTeam, currentTeam.currentOperation.text);
             UI.updateQuestion(this.activeTeam === 1 ? 2 : 1, "À ton tour !");
 
+            // (Les effets programmés - vol de temps - sont appliqués plus bas après l'initialisation du chrono)
+
+            // Appliquer les confusions programmées : afficher l'opération réelle puis la fantôme
+            const confForActiveIdx = this.pendingConfusions.findIndex(c => c.target === this.activeTeam);
+            if (confForActiveIdx !== -1) {
+                const conf = this.pendingConfusions.splice(confForActiveIdx, 1)[0];
+                // L'opération réelle reste inchangée (vérification au moment de la réponse)
+                // On affiche l'illusion après 1 seconde
+                setTimeout(() => {
+                    UI.updateQuestion(this.activeTeam, conf.ghostOp.text);
+                    UI.showMessage('🌀 Illusion affichée : attention à la vraie question !', 'warning');
+                }, 1000);
+            }
+
             // Si c'est le tour du joueur en mode IA, l'IA peut utiliser ses bonus "hors-tour"
             if (this.gameMode === 'pvai' && this.activeTeam === 1) {
                 // Initialiser le temps avant que l'IA puisse le réduire
@@ -727,18 +727,65 @@ class Game {
                 this.updateTimerDisplay();
                 UI.updateTimerBar(this.timeLeft, this.maxTime);
 
-                // L'IA tente d'utiliser confusion ou vol de temps
-                this.AIUseOutOfTurnBonuses();
+                // L'IA peut décider d'utiliser un bonus pendant son propre tour via tryUseBonusIA()
 
-                // Démarrer le timer (avec éventuellement le temps réduit)
-                this.startTimer();
+                // Appliquer tout vol de temps programmé ciblant l'équipe active (joueur)
+                const stealsForActive = this.pendingTimeSteals.filter(s => s.target === this.activeTeam);
+                if (stealsForActive.length > 0) {
+                    let total = 0;
+                    stealsForActive.forEach(s => { total += s.amount; });
+                    this.timeLeft = Math.max(0, this.timeLeft - total);
+                    UI.showMessage(`⏱️ Vol de temps appliqué : -${total}s pour ${this.activeTeam === 1 ? this.team1.name : this.team2.name}`, 'info');
+                    this.pendingTimeSteals = this.pendingTimeSteals.filter(s => s.target !== this.activeTeam);
+                    this.updateTimerDisplay();
+                    UI.updateTimerBar(this.timeLeft, this.maxTime);
+                }
+
+                // Démarrer le timer (en conservant la valeur ajustée)
+                this.startTimer(false);
             } else {
-                this.startTimer();
+                // Appliquer vol de temps s'il y en a (mode PVP ou autres)
+                let timeLimit = CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit;
+                const stealsForActive2 = this.pendingTimeSteals.filter(s => s.target === this.activeTeam);
+                if (stealsForActive2.length > 0) {
+                    let total = 0;
+                    stealsForActive2.forEach(s => { total += s.amount; });
+                    this.timeLeft = Math.max(0, timeLimit - total);
+                    this.maxTime = timeLimit;
+                    UI.showMessage(`⏱️ Vol de temps appliqué : -${total}s pour ${this.activeTeam === 1 ? this.team1.name : this.team2.name}`, 'info');
+                    this.pendingTimeSteals = this.pendingTimeSteals.filter(s => s.target !== this.activeTeam);
+                    this.updateTimerDisplay();
+                    UI.updateTimerBar(this.timeLeft, this.maxTime);
+                    this.startTimer(false);
+                } else {
+                    this.startTimer();
+                }
             }
         } else if (this.gameMode === 'pvai' && this.activeTeam === 2) {
             this.generateOperation(currentTeam);
             UI.updateQuestion(2, currentTeam.currentOperation.text);
             UI.updateQuestion(1, "L'IA réfléchit...");
+
+            // Appliquer vol de temps et confusion ciblant l'IA (équipe 2)
+            const stealsForActive2 = this.pendingTimeSteals.filter(s => s.target === 2);
+            if (stealsForActive2.length > 0) {
+                stealsForActive2.forEach(s => {
+                    this.timeLeft = Math.max(0, (typeof this.timeLeft === 'number' && this.timeLeft > 0 ? this.timeLeft : CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit) - s.amount);
+                    UI.showMessage(`⏱️ Vol de temps appliqué : -${s.amount}s pour l'IA`, 'info');
+                });
+                this.pendingTimeSteals = this.pendingTimeSteals.filter(s => s.target !== 2);
+                this.updateTimerDisplay();
+                UI.updateTimerBar(this.timeLeft, this.maxTime || CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit);
+            }
+
+            const confForIAIdx = this.pendingConfusions.findIndex(c => c.target === 2);
+            if (confForIAIdx !== -1) {
+                const conf = this.pendingConfusions.splice(confForIAIdx, 1)[0];
+                setTimeout(() => {
+                    UI.updateQuestion(2, conf.ghostOp.text);
+                    UI.showMessage('🌀 Illusion affichée pour l\'IA (ne change pas la vraie réponse)', 'warning');
+                }, 1000);
+            }
             this.startIA();
         }
     }
@@ -810,7 +857,7 @@ class Game {
                 this.waitingForAnswer = false;
                 currentTeam.clearAnswer();
                 UI.clearAnswerDisplay();
-                this.startTimer();
+                this.startTimer(false);
                 return;
             }
             
@@ -821,7 +868,7 @@ class Game {
                 this.waitingForAnswer = false;
                 currentTeam.clearAnswer();
                 UI.clearAnswerDisplay();
-                this.startTimer();
+                this.startTimer(false);
                 return;
             }
             
@@ -864,7 +911,7 @@ class Game {
                     if (this.gameMode === 'pvai' && this.activeTeam === 2) {
                         this.startIA();
                     } else {
-                        this.startTimer();
+                            this.startTimer(false);
                     }
                 }, CONFIG.ANIMATION_DURATION);
             }
@@ -1076,7 +1123,7 @@ class Game {
 
     resume() {
         this.isPaused = false;
-        this.startTimer();
+        this.startTimer(false);
         if (this.gameMode === 'pvai' && this.activeTeam === 2) {
             this.startIA();
         }
