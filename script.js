@@ -335,16 +335,23 @@ class Game {
         const bonus = this.bonusInventories[team][bonusId];
         if (!bonus || bonus.count <= 0) return;
 
-        // Liste des bonus utilisables même pendant le tour adverse
         const usableOutOfTurn = ['confusion', 'steal_attempt'];
 
         // Vérification pour les joueurs humains (non IA)
         if (!isIA) {
             const isPlayerTurn = (this.activeTeam === team);
-            const isUsableOutOfTurn = usableOutOfTurn.includes(bonusId);
-            if (!isPlayerTurn && !isUsableOutOfTurn) {
-                UI.showMessage("Ce n'est pas le moment d'utiliser ce bonus !", 'warning');
-                return;
+            if (usableOutOfTurn.includes(bonusId)) {
+                // Ces bonus ne peuvent être utilisés que pendant le tour adverse
+                if (isPlayerTurn) {
+                    UI.showMessage("Ce bonus ne peut être utilisé que pendant le tour adverse !", 'warning');
+                    return;
+                }
+            } else {
+                // Bonus normaux : seulement pendant son propre tour
+                if (!isPlayerTurn) {
+                    UI.showMessage("Ce n'est pas le moment d'utiliser ce bonus !", 'warning');
+                    return;
+                }
             }
         }
 
@@ -1107,7 +1114,7 @@ class Game {
     testAddBonus() {
         const testBonus = { id: 'double_points', name: "💪 Double points", icon: "⭐", color: "#ffd700" };
         this.bonusInventories[this.activeTeam][testBonus.id].count++;
-        UI.updateBonusIcons(this.bonusInventories);// CORRECTION : utiliser updateBonusIcons
+        UI.updateBonusIcons(this.bonusInventories);
         UI.showMessage(`✨ Bonus de test ajouté !`, 'success');
     }
 
@@ -1928,30 +1935,42 @@ class UI {
     }
 
     static setupBonusUI() {
-        if (!document.querySelector('.bonus-bar')) {
-            const gameScreen = document.getElementById('game-screen');
-            const gameArea = document.querySelector('.game-area');
-            
-            if (gameArea && gameScreen) {
-                const bonusBar = document.createElement('div');
-                bonusBar.className = 'bonus-bar';
-                bonusBar.innerHTML = `
-                    <div class="bonus-section team1-bonus">
-                        <div class="bonus-label">🔴 Bonus Rouge</div>
-                        <div class="bonus-icons" id="team1-bonus-icons"></div>
-                    </div>
-                    <div class="bonus-section team2-bonus">
-                        <div class="bonus-label">🔵 Bonus Bleu</div>
-                        <div class="bonus-icons" id="team2-bonus-icons"></div>
-                    </div>
-                    <div class="attempts-compact">
-                        <span class="attempts-team1">🔴 <span id="attempts-1">3</span></span>
-                        <span class="attempts-team2">🔵 <span id="attempts-2">3</span></span>
-                    </div>
-                `;
-                
-                gameArea.parentNode.insertBefore(bonusBar, gameArea.nextSibling);
-            }
+        // Supprimer l'ancienne barre de bonus si elle existe (celle du HTML)
+        const oldBar = document.querySelector('.bonus-bar');
+        if (oldBar) oldBar.remove();
+
+        const gameScreen = document.getElementById('game-screen');
+        if (!gameScreen) return;
+
+        // Panneau gauche pour l'équipe 1 (rouge)
+        let leftBonus = document.getElementById('bonus-left');
+        if (!leftBonus) {
+            leftBonus = document.createElement('div');
+            leftBonus.id = 'bonus-left';
+            leftBonus.className = 'bonus-side left';
+            gameScreen.appendChild(leftBonus);
+        }
+
+        // Panneau droit pour l'équipe 2 (bleue)
+        let rightBonus = document.getElementById('bonus-right');
+        if (!rightBonus) {
+            rightBonus = document.createElement('div');
+            rightBonus.id = 'bonus-right';
+            rightBonus.className = 'bonus-side right';
+            gameScreen.appendChild(rightBonus);
+        }
+
+        // Affichage des tentatives en bas
+        let attemptsDisplay = document.getElementById('attempts-display');
+        if (!attemptsDisplay) {
+            attemptsDisplay = document.createElement('div');
+            attemptsDisplay.id = 'attempts-display';
+            attemptsDisplay.className = 'attempts-display';
+            attemptsDisplay.innerHTML = `
+                <span class="attempts-team1">🔴 <span id="attempts-1">3</span></span>
+                <span class="attempts-team2">🔵 <span id="attempts-2">3</span></span>
+            `;
+            gameScreen.appendChild(attemptsDisplay);
         }
     }
 
@@ -1982,11 +2001,10 @@ class UI {
     }
 
     static updateBonusIcons(inventories) {
-        const team1Container = document.getElementById('team1-bonus-icons');
-        const team2Container = document.getElementById('team2-bonus-icons');
-        
-        this.renderBonusIconsForTeam(team1Container, inventories[1], 1);
-        this.renderBonusIconsForTeam(team2Container, inventories[2], 2);
+        const leftContainer = document.getElementById('bonus-left');
+        const rightContainer = document.getElementById('bonus-right');
+        if (leftContainer) this.renderBonusIconsForTeam(leftContainer, inventories[1], 1);
+        if (rightContainer) this.renderBonusIconsForTeam(rightContainer, inventories[2], 2);
     }
 
     static renderBonusIconsForTeam(container, inventory, team) {
@@ -2146,12 +2164,94 @@ class UI {
             .attempts-team1 span, .attempts-team2 span {
                 background: white;
                 color: black;
-                padding: 4px 12px;
+                padding: 5px 15px;
                 border-radius: 30px;
-                font-weight: bold;
-                min-width: 35px;
-                text-align: center;
+                margin-left: 8px;
             }
+
+            .game-container {
+                position: relative !important;
+            }
+
+            .bonus-side {
+                position: absolute;
+                top: 300px; /* Ajustez selon la hauteur de votre header */
+                width: 170px;
+                background: rgba(0, 0, 0, 0.4);
+                backdrop-filter: blur(8px);
+                border-radius: 20px;
+                padding: 15px 10px;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                z-index: 100;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .bonus-side.left {
+                left: 100px;
+            }
+
+            .bonus-side.right {
+                right: 10px;
+            }
+
+            /* Titre de l'équipe dans le panneau */
+            .bonus-side::before {
+                content: attr(data-team);
+                display: block;
+                text-align: center;
+                font-weight: bold;
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+                color: white;
+                text-shadow: 0 2px 4px black;
+            }
+
+            /* Conteneur des icônes en colonne */
+            .bonus-side .bonus-icons {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            /* Icônes de bonus */
+            .bonus-side .bonus-icon-item {
+                width: 100%;
+                justify-content: flex-start;
+                background: rgba(0, 0, 0, 0.5);
+                border-radius: 40px;
+                padding: 8px 12px;
+                transition: all 0.2s;
+            }
+
+            .bonus-side .bonus-icon-item:hover {
+                transform: translateX(5px);
+                background: rgba(0, 0, 0, 0.7);
+                border-color: gold;
+            }
+
+            .attempts-display {
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(5px);
+                padding: 10px 30px;
+                border-radius: 50px;
+                display: flex;
+                gap: 40px;
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: white;
+                border: 2px solid rgba(255,255,255,0.2);
+                z-index: 100;
+            }
+
+
         `;
         document.head.appendChild(style);
     }
