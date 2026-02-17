@@ -595,58 +595,43 @@ class Game {
     }
 
     generateConfusingOperation(originalResult) {
-        // Génère une opération (add, sub, mul, div) dont le résultat est originalResult
-        const operations = ['add', 'sub', 'mul', 'div'];
-        const op = operations[Math.floor(Math.random() * operations.length)];
-        let a, b, operationString;
+        // Évite les résultats négatifs ou nuls problématiques
+        if (originalResult <= 0) {
+            let a = this.getRandomNumber(0, 10);
+            let b = originalResult - a;
+            if (b < 0) { a = originalResult; b = 0; }
+            return { text: `${a} + ${b}`, result: originalResult };
+        }
 
+        const op = this.getRandomNumber(0, 3); // 0:add, 1:sub, 2:mul, 3:div
         switch(op) {
-            case 'add':
-                a = this.getRandomNumber(0, originalResult);
-                b = originalResult - a;
-                operationString = `${a} + ${b}`;
-                break;
-            case 'sub':
-                a = this.getRandomNumber(originalResult, originalResult + 20);
-                b = a - originalResult;
-                operationString = `${a} - ${b}`;
-                break;
-            case 'mul': {
-                // Cherche un diviseur de originalResult
+            case 0: // addition
+                let a = this.getRandomNumber(0, originalResult);
+                let b = originalResult - a;
+                return { text: `${a} + ${b}`, result: originalResult };
+            case 1: // soustraction
+                let bSub = this.getRandomNumber(0, 20);
+                let aSub = originalResult + bSub;
+                return { text: `${aSub} - ${bSub}`, result: originalResult };
+            case 2: // multiplication
                 let divisors = [];
-                for (let i = 1; i <= Math.sqrt(originalResult); i++) {
-                    if (originalResult % i === 0) {
-                        divisors.push(i);
-                        if (i !== originalResult / i) divisors.push(originalResult / i);
-                    }
-                }
-                if (divisors.length > 0) {
-                    a = divisors[Math.floor(Math.random() * divisors.length)];
-                    b = originalResult / a;
-                    operationString = `${a} × ${b}`;
-                    break;
-                } // sinon fallback à addition
-            }
-            case 'div': {
-                // Cherche un diviseur simple (1-10) de originalResult
-                let divisors = [];
-                for (let i = 1; i <= 10; i++) {
+                for (let i = 1; i <= originalResult; i++) {
                     if (originalResult % i === 0) divisors.push(i);
                 }
                 if (divisors.length > 0) {
-                    b = divisors[Math.floor(Math.random() * divisors.length)];
-                    a = originalResult * b;
-                    operationString = `${a} ÷ ${b}`;
-                    break;
-                } // sinon fallback
-            }
+                    let aMul = divisors[Math.floor(Math.random() * divisors.length)];
+                    let bMul = originalResult / aMul;
+                    return { text: `${aMul} × ${bMul}`, result: originalResult };
+                }
+                // fallback addition
+                return { text: `0 + ${originalResult}`, result: originalResult };
+            case 3: // division
+                let bDiv = this.getRandomNumber(1, 10);
+                let aDiv = originalResult * bDiv;
+                return { text: `${aDiv} ÷ ${bDiv}`, result: originalResult };
             default:
-                // Fallback addition
-                a = this.getRandomNumber(0, originalResult);
-                b = originalResult - a;
-                operationString = `${a} + ${b}`;
+                return { text: `${originalResult} + 0`, result: originalResult };
         }
-        return { text: operationString, result: originalResult };
     }
 
     // Dans la classe Game, remplacez startTimer()
@@ -1935,43 +1920,35 @@ class UI {
     }
 
     static setupBonusUI() {
-        // Supprimer l'ancienne barre de bonus si elle existe (celle du HTML)
-        const oldBar = document.querySelector('.bonus-bar');
-        if (oldBar) oldBar.remove();
+        // Supprimer les anciens conteneurs s'ils existent
+        const oldLeft = document.getElementById('bonus-left');
+        if (oldLeft) oldLeft.remove();
+        const oldRight = document.getElementById('bonus-right');
+        if (oldRight) oldRight.remove();
+        const oldAttempts = document.getElementById('attempts-display');
+        if (oldAttempts) oldAttempts.remove();
 
-        const gameScreen = document.getElementById('game-screen');
-        if (!gameScreen) return;
+        // Créer les nouveaux conteneurs fixés
+        const leftBonus = document.createElement('div');
+        leftBonus.id = 'bonus-left';
+        leftBonus.className = 'bonus-side left';
+        leftBonus.dataset.team = '🔴 Équipe Rouge';
+        document.body.appendChild(leftBonus);
 
-        // Panneau gauche pour l'équipe 1 (rouge)
-        let leftBonus = document.getElementById('bonus-left');
-        if (!leftBonus) {
-            leftBonus = document.createElement('div');
-            leftBonus.id = 'bonus-left';
-            leftBonus.className = 'bonus-side left';
-            gameScreen.appendChild(leftBonus);
-        }
+        const rightBonus = document.createElement('div');
+        rightBonus.id = 'bonus-right';
+        rightBonus.className = 'bonus-side right';
+        rightBonus.dataset.team = '🔵 Équipe Bleue';
+        document.body.appendChild(rightBonus);
 
-        // Panneau droit pour l'équipe 2 (bleue)
-        let rightBonus = document.getElementById('bonus-right');
-        if (!rightBonus) {
-            rightBonus = document.createElement('div');
-            rightBonus.id = 'bonus-right';
-            rightBonus.className = 'bonus-side right';
-            gameScreen.appendChild(rightBonus);
-        }
-
-        // Affichage des tentatives en bas
-        let attemptsDisplay = document.getElementById('attempts-display');
-        if (!attemptsDisplay) {
-            attemptsDisplay = document.createElement('div');
-            attemptsDisplay.id = 'attempts-display';
-            attemptsDisplay.className = 'attempts-display';
-            attemptsDisplay.innerHTML = `
-                <span class="attempts-team1">🔴 <span id="attempts-1">3</span></span>
-                <span class="attempts-team2">🔵 <span id="attempts-2">3</span></span>
-            `;
-            gameScreen.appendChild(attemptsDisplay);
-        }
+        const attemptsDisplay = document.createElement('div');
+        attemptsDisplay.id = 'attempts-display';
+        attemptsDisplay.className = 'attempts-display';
+        attemptsDisplay.innerHTML = `
+            <span class="attempts-team1">🔴 <span id="attempts-1">3</span></span>
+            <span class="attempts-team2">🔵 <span id="attempts-2">3</span></span>
+        `;
+        document.body.appendChild(attemptsDisplay);
     }
 
     static playSound(type) {
@@ -2115,27 +2092,13 @@ class UI {
                 transform: scale(0.95);
             }
             
-            .bonus-emoji {
-                font-size: 1.8rem;
-                filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
-                line-height: 1;
-            }
+            .bonus-emoji { font-size: 1.8rem; line-height: 1; }
             
             .bonus-counter {
-                font-size: 1.1rem;
-                font-weight: bold;
-                color: white;
-                min-width: 28px;
-                height: 28px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 14px;
-                padding: 0 6px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-                text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+                background: gold; color: black; font-weight: bold;
+                padding: 2px 8px; border-radius: 20px; margin-left: auto;
             }
-            
+                        
             .no-bonus-message {
                 font-size: 1.8rem;
                 opacity: 0.5;
@@ -2162,11 +2125,7 @@ class UI {
             }
             
             .attempts-team1 span, .attempts-team2 span {
-                background: white;
-                color: black;
-                padding: 5px 15px;
-                border-radius: 30px;
-                margin-left: 8px;
+                background: white; color: black; padding: 5px 15px; border-radius: 30px; margin-left: 8px;
             }
 
             .game-container {
@@ -2174,28 +2133,24 @@ class UI {
             }
 
             .bonus-side {
-                position: absolute;
-                top: 300px; /* Ajustez selon la hauteur de votre header */
-                width: 170px;
-                background: rgba(0, 0, 0, 0.4);
+                position: fixed;
+                top: 120px; /* Ajustez selon la hauteur de votre header */
+                width: 160px;
+                background: rgba(0, 0, 0, 0.6);
                 backdrop-filter: blur(8px);
-                border-radius: 20px;
+                border-radius: 15px;
                 padding: 15px 10px;
                 border: 2px solid rgba(255, 255, 255, 0.2);
                 box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-                z-index: 100;
+                z-index: 1000;
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
+                color: white;
             }
 
-            .bonus-side.left {
-                left: 100px;
-            }
-
-            .bonus-side.right {
-                right: 10px;
-            }
+            .bonus-side.left { left: 10px; }
+            .bonus-side.right { right: 10px; }
 
             /* Titre de l'équipe dans le panneau */
             .bonus-side::before {
@@ -2213,32 +2168,34 @@ class UI {
             .bonus-side .bonus-icons {
                 display: flex;
                 flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
+                gap: 8px;
             }
 
             /* Icônes de bonus */
             .bonus-side .bonus-icon-item {
-                width: 100%;
-                justify-content: flex-start;
-                background: rgba(0, 0, 0, 0.5);
-                border-radius: 40px;
-                padding: 8px 12px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 10px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 30px;
+                cursor: pointer;
                 transition: all 0.2s;
+                border: 2px solid transparent;
             }
 
             .bonus-side .bonus-icon-item:hover {
                 transform: translateX(5px);
-                background: rgba(0, 0, 0, 0.7);
+                background: rgba(255,255,255,0.2);
                 border-color: gold;
             }
 
             .attempts-display {
-                position: absolute;
+                position: fixed;
                 bottom: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                background: rgba(0, 0, 0, 0.5);
+                background: rgba(0,0,0,0.6);
                 backdrop-filter: blur(5px);
                 padding: 10px 30px;
                 border-radius: 50px;
@@ -2248,9 +2205,8 @@ class UI {
                 font-weight: bold;
                 color: white;
                 border: 2px solid rgba(255,255,255,0.2);
-                z-index: 100;
+                z-index: 1000;
             }
-
 
         `;
         document.head.appendChild(style);

@@ -1050,14 +1050,6 @@ body {
     font-weight: bold;
 }
 
-.attempts-team1 span, .attempts-team2 span {
-    background: white;
-    color: black;
-    padding: 5px 12px;
-    border-radius: 20px;
-    margin-left: 5px;
-}
-
 .attempts-indicator {
     display: flex;
     justify-content: space-around;
