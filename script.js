@@ -251,7 +251,7 @@ class Game {
                 double_points: { count: 0, name: "💪 Double points", icon: "⭐", color: "#ffd700" },
                 extra_attempt: { count: 0, name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
                 shield: { count: 0, name: "🛡️ Bouclier", icon: "🛡️", color: "#0984e3" },
-                steal_attempt: { count: 0, name: "👻 Voleur", icon: "👻", color: "#6c5ce7" },
+                steal_attempt: { count: 0, name: "⏱️ Vol de temps", icon: "⏱️", color: "#6c5ce7" },
                 time_bonus: { count: 0, name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
                 confusion: { count: 0, name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
             },
@@ -259,7 +259,7 @@ class Game {
                 double_points: { count: 0, name: "💪 Double points", icon: "⭐", color: "#ffd700" },
                 extra_attempt: { count: 0, name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
                 shield: { count: 0, name: "🛡️ Bouclier", icon: "🛡️", color: "#0984e3" },
-                steal_attempt: { count: 0, name: "👻 Voleur", icon: "👻", color: "#6c5ce7" },
+                steal_attempt: { count: 0, name: "⏱️ Vol de temps", icon: "⏱️", color: "#6c5ce7" },
                 time_bonus: { count: 0, name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
                 confusion: { count: 0, name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
             }
@@ -269,9 +269,9 @@ class Game {
             { id: 'double_points', name: "💪 Double points", icon: "⭐", description: "Double les points pour 1 tour", color: "#ffd700" },
             { id: 'extra_attempt', name: "➕ Tentative sup", icon: "➕", description: "Gagne 1 tentative supplémentaire", color: "#00cec9" },
             { id: 'shield', name: "🛡️ Bouclier", icon: "🛡️", description: "Protège contre 1 erreur", color: "#0984e3" },
-            { id: 'steal_attempt', name: "👻 Voleur", icon: "👻", description: "Vole 1 tentative à l'adversaire", color: "#6c5ce7" },
+            { id: 'steal_attempt', name: "⏱️ Vol de temps", icon: "⏱️", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
             { id: 'time_bonus', name: "⏱️ Temps bonus", icon: "⏱️", description: "+5 secondes au chrono", color: "#fdcb6e" },
-            { id: 'confusion', name: "🌀 Confusion", icon: "🌀", description: "L'adversaire perd 1 tentative", color: "#e17055" }
+            { id: 'confusion', name: "🌀 Confusion", icon: "🌀", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
         ];
 
         this.bonusActions = {
@@ -320,9 +320,9 @@ class Game {
                 { id: 'double_points', name: "💪 Double points", icon: "⭐", color: "#ffd700" },
                 { id: 'extra_attempt', name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
                 { id: 'shield', name: "🛡️ Bouclier", icon: "🛡️", color: "#0984e3" },
-                { id: 'steal_attempt', name: "👻 Voleur", icon: "👻", color: "#6c5ce7" },
+                { id: 'steal_attempt', name: "⏱️ Vol de temps", icon: "⏱️", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
                 { id: 'time_bonus', name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
-                { id: 'confusion', name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
+                { id: 'confusion', name: "🌀 Confusion", icon: "🌀", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
             ];
             const randomBonus = bonusTypes[Math.floor(Math.random() * bonusTypes.length)];
             this.bonusInventories[team][randomBonus.id].count++;
@@ -331,65 +331,77 @@ class Game {
         }
     }
 
-    useBonus(bonusId) {
-        // Vérifier que c'est le tour du joueur (pas l'IA)
-        if (this.gameMode === 'pvai' && this.activeTeam === 2) {
-            UI.showMessage("Ce n'est pas votre tour !", 'warning');
-            return;
-        }
-        
-        const team = this.activeTeam;
+    useBonus(bonusId, team, isIA = false) {
         const bonus = this.bonusInventories[team][bonusId];
         if (!bonus || bonus.count <= 0) return;
-        
+
+        // Liste des bonus utilisables même pendant le tour adverse
+        const usableOutOfTurn = ['confusion', 'steal_attempt']; 
+
+        // Vérification pour les joueurs humains (isIA = false)
+        if (!isIA) {
+            const isPlayerTurn = (this.activeTeam === team);
+            const isUsableOutOfTurn = usableOutOfTurn.includes(bonusId);
+            if (!isPlayerTurn && !isUsableOutOfTurn) {
+                UI.showMessage("Ce n'est pas le moment d'utiliser ce bonus !", 'warning');
+                return;
+            }
+        }
+
+        const opponent = team === 1 ? 2 : 1;
+
         switch(bonusId) {
             case 'double_points':
                 this.pointMultiplier = 2;
                 UI.showMessage("💪 Double points activé !", 'success');
                 break;
+
             case 'extra_attempt':
                 this.attempts[team]++;
                 UI.updateAttempts();
                 UI.showMessage("➕ Tentative supplémentaire !", 'success');
                 break;
+
             case 'shield':
                 this.shieldActive = true;
                 this.shieldTeam = team;
                 UI.showMessage("🛡️ Bouclier activé !", 'success');
                 break;
-            case 'steal_attempt':
-                const opponent = team === 1 ? 2 : 1;
-                if (this.attempts[opponent] > 0) {
-                    this.attempts[opponent]--;
-                    this.attempts[team]++;
-                    UI.updateAttempts();
-                    UI.showMessage(`👻 Tentative volée à l'adversaire !`, 'success');
+
+            case 'steal_attempt': // Vol de temps
+                if (this.timeLeft > 0) {
+                    this.timeLeft = Math.max(0, this.timeLeft - 5);
+                    this.updateTimerDisplay();
+                    UI.updateTimerBar(this.timeLeft, this.maxTime);
+                    UI.showMessage(`⏱️ Vol de temps : -5s pour l'adversaire !`, 'success');
                 } else {
-                    UI.showMessage("L'adversaire n'a pas de tentative à voler !", 'warning');
+                    UI.showMessage("L'adversaire n'a plus de temps !", 'warning');
                     return;
                 }
                 break;
+
             case 'time_bonus':
                 this.timeLeft += 5;
                 this.updateTimerDisplay();
                 UI.showMessage("⏱️ +5 secondes !", 'success');
                 break;
-            case 'confusion':
-                const opponent2 = team === 1 ? 2 : 1;
-                if (this.attempts[opponent2] > 0) {
-                    this.attempts[opponent2]--;
-                    UI.updateAttempts();
-                    UI.showMessage(`🌀 L'adversaire perd une tentative !`, 'success');
-                } else {
-                    UI.showMessage("L'adversaire n'a pas de tentative à perdre !", 'warning');
-                    return;
+
+            case 'confusion': {
+                const advTeam = opponent === 1 ? this.team1 : this.team2;
+                if (advTeam.currentOperation && advTeam.currentOperation.result !== null) {
+                    const originalResult = advTeam.currentOperation.result;
+                    const newOp = this.generateConfusingOperation(originalResult);
+                    advTeam.currentOperation = newOp;
+                    UI.updateQuestion(opponent, newOp.text);
+                    UI.showMessage(`🌀 Confusion ! La question de l'adversaire a changé !`, 'success');
                 }
                 break;
+            }
+
             default:
                 return;
         }
-        
-        // Décrémenter le compteur du bonus pour cette équipe
+
         bonus.count--;
         UI.updateBonusIcons(this.bonusInventories);
     }
@@ -573,6 +585,61 @@ class Game {
 
     getRandomNumber(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    generateConfusingOperation(originalResult) {
+        // Génère une opération (add, sub, mul, div) dont le résultat est originalResult
+        const operations = ['add', 'sub', 'mul', 'div'];
+        const op = operations[Math.floor(Math.random() * operations.length)];
+        let a, b, operationString;
+
+        switch(op) {
+            case 'add':
+                a = this.getRandomNumber(0, originalResult);
+                b = originalResult - a;
+                operationString = `${a} + ${b}`;
+                break;
+            case 'sub':
+                a = this.getRandomNumber(originalResult, originalResult + 20);
+                b = a - originalResult;
+                operationString = `${a} - ${b}`;
+                break;
+            case 'mul': {
+                // Cherche un diviseur de originalResult
+                let divisors = [];
+                for (let i = 1; i <= Math.sqrt(originalResult); i++) {
+                    if (originalResult % i === 0) {
+                        divisors.push(i);
+                        if (i !== originalResult / i) divisors.push(originalResult / i);
+                    }
+                }
+                if (divisors.length > 0) {
+                    a = divisors[Math.floor(Math.random() * divisors.length)];
+                    b = originalResult / a;
+                    operationString = `${a} × ${b}`;
+                    break;
+                } // sinon fallback à addition
+            }
+            case 'div': {
+                // Cherche un diviseur simple (1-10) de originalResult
+                let divisors = [];
+                for (let i = 1; i <= 10; i++) {
+                    if (originalResult % i === 0) divisors.push(i);
+                }
+                if (divisors.length > 0) {
+                    b = divisors[Math.floor(Math.random() * divisors.length)];
+                    a = originalResult * b;
+                    operationString = `${a} ÷ ${b}`;
+                    break;
+                } // sinon fallback
+            }
+            default:
+                // Fallback addition
+                a = this.getRandomNumber(0, originalResult);
+                b = originalResult - a;
+                operationString = `${a} + ${b}`;
+        }
+        return { text: operationString, result: originalResult };
     }
 
     // Dans la classe Game, remplacez startTimer()
@@ -891,6 +958,9 @@ class Game {
 
     startIA() {
         if (this.iaTimeout) clearTimeout(this.iaTimeout);
+
+        // L'IA peut utiliser un bonus avant de réfléchir
+        this.tryUseBonusIA();
         
         const settings = CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty];
         
@@ -1022,6 +1092,20 @@ class Game {
         this.bonusInventories[this.activeTeam][testBonus.id].count++;
         UI.updateBonusIcons(this.bonusInventories);// CORRECTION : utiliser updateBonusIcons
         UI.showMessage(`✨ Bonus de test ajouté !`, 'success');
+    }
+
+    tryUseBonusIA() {
+        // L'IA (team 2) examine son inventaire et utilise un bonus aléatoirement
+        const inventory = this.bonusInventories[2];
+        const usableOutOfTurn = ['confusion', 'steal_attempt'];
+        // On filtre les bonus qui ne peuvent être utilisés que pendant son tour
+        const available = Object.entries(inventory).filter(([id, b]) => 
+            b.count > 0 && !usableOutOfTurn.includes(id)
+        );
+        if (available.length === 0) return;
+
+        const [bonusId] = available[Math.floor(Math.random() * available.length)];
+        this.useBonus(bonusId, 2, true);
     }
 }
 
@@ -1896,10 +1980,8 @@ class UI {
                 e.stopPropagation();
                 const bonusId = item.dataset.bonusId;
                 const teamId = parseInt(item.dataset.team);
-                if (game && game.activeTeam === teamId) {
-                    game.useBonus(bonusId);
-                } else {
-                    UI.showMessage("Ce n'est pas le moment d'utiliser ce bonus !", 'warning');
+                if (game) {
+                    game.useBonus(bonusId, teamId);  // On transmet l'équipe
                 }
             });
         });
