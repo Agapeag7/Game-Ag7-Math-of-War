@@ -336,9 +336,9 @@ class Game {
         if (!bonus || bonus.count <= 0) return;
 
         // Liste des bonus utilisables même pendant le tour adverse
-        const usableOutOfTurn = ['confusion', 'steal_attempt']; 
+        const usableOutOfTurn = ['confusion', 'steal_attempt'];
 
-        // Vérification pour les joueurs humains (isIA = false)
+        // Vérification pour les joueurs humains (non IA)
         if (!isIA) {
             const isPlayerTurn = (this.activeTeam === team);
             const isUsableOutOfTurn = usableOutOfTurn.includes(bonusId);
@@ -703,22 +703,39 @@ class Game {
 
     prepareNextTurn() {
         this.waitingForAnswer = false;
-        
+
         // Réinitialiser les tentatives pour l'équipe active
         this.attempts[this.activeTeam] = this.maxAttempts;
         UI.updateAttempts();
-        
+
         // Réinitialiser les réponses
         this.team1.clearAnswer();
         this.team2.clearAnswer();
-        
+
         const currentTeam = this.activeTeam === 1 ? this.team1 : this.team2;
-        
+
         if (this.gameMode === 'pvp' || (this.gameMode === 'pvai' && this.activeTeam === 1)) {
             this.generateOperation(currentTeam);
             UI.updateQuestion(this.activeTeam, currentTeam.currentOperation.text);
             UI.updateQuestion(this.activeTeam === 1 ? 2 : 1, "À ton tour !");
-            this.startTimer();
+
+            // Si c'est le tour du joueur en mode IA, l'IA peut utiliser ses bonus "hors-tour"
+            if (this.gameMode === 'pvai' && this.activeTeam === 1) {
+                // Initialiser le temps avant que l'IA puisse le réduire
+                let timeLimit = CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit;
+                this.timeLeft = timeLimit;
+                this.maxTime = this.timeLeft;
+                this.updateTimerDisplay();
+                UI.updateTimerBar(this.timeLeft, this.maxTime);
+
+                // L'IA tente d'utiliser confusion ou vol de temps
+                this.AIUseOutOfTurnBonuses();
+
+                // Démarrer le timer (avec éventuellement le temps réduit)
+                this.startTimer();
+            } else {
+                this.startTimer();
+            }
         } else if (this.gameMode === 'pvai' && this.activeTeam === 2) {
             this.generateOperation(currentTeam);
             UI.updateQuestion(2, currentTeam.currentOperation.text);
@@ -1095,10 +1112,9 @@ class Game {
     }
 
     tryUseBonusIA() {
-        // L'IA (team 2) examine son inventaire et utilise un bonus aléatoirement
+        // L'IA (team 2) examine son inventaire et utilise un bonus aléatoirement parmi ceux utilisables pendant son tour
         const inventory = this.bonusInventories[2];
         const usableOutOfTurn = ['confusion', 'steal_attempt'];
-        // On filtre les bonus qui ne peuvent être utilisés que pendant son tour
         const available = Object.entries(inventory).filter(([id, b]) => 
             b.count > 0 && !usableOutOfTurn.includes(id)
         );
@@ -1106,6 +1122,20 @@ class Game {
 
         const [bonusId] = available[Math.floor(Math.random() * available.length)];
         this.useBonus(bonusId, 2, true);
+    }
+
+    AIUseOutOfTurnBonuses() {
+        // L'IA (team 2) peut utiliser confusion ou vol de temps pendant le tour du joueur
+        const inventory = this.bonusInventories[2];
+        const outOfTurnBonuses = ['confusion', 'steal_attempt'];
+        const available = outOfTurnBonuses.filter(id => inventory[id].count > 0);
+        if (available.length === 0) return;
+
+        // Probabilité de 50% d'utiliser un bonus si disponible
+        if (Math.random() < 0.5) {
+            const bonusId = available[Math.floor(Math.random() * available.length)];
+            this.useBonus(bonusId, 2, true); // isIA = true
+        }
     }
 }
 
