@@ -65,27 +65,27 @@ class PowerUp {
         this.types = [
             { 
                 id: 'double_points',
-                name: "💪 DOUBLE POINTS", 
-                icon: "⭐",
+                name: "<i class='fas fa-dumbbell'></i> DOUBLE POINTS", 
+                icon: "<i class='fas fa-star'></i>",
                 description: "Prochaine bonne réponse = 2 points !",
                 color: "#ffd700",
                 duration: 1,
                 applyEffect: (game) => {
                     game.pointMultiplier = 2;
-                    UI.showMessage("💪 DOUBLE POINTS activé !", 'success');
+                    UI.showMessage("<i class='fas fa-dumbbell'></i> DOUBLE POINTS activé !", 'success');
                 }
             },
             { 
                 id: 'time_freeze',
-                name: "❄️ GEL DU TEMPS", 
-                icon: "⏸️",
+                name: "<i class='fas fa-snowflake'></i> GEL DU TEMPS", 
+                icon: "<i class='fas fa-pause'></i>",
                 description: "Le chrono s'arrête pour l'adversaire (5s)",
                 color: "#00cec9",
                 duration: 5000,
                 applyEffect: (game) => {
                     game.timeFrozen = true;
                     game.frozenUntil = Date.now() + 5000;
-                    UI.showMessage("❄️ TEMPS GELÉ pour l'adversaire !", 'info');
+                    UI.showMessage("<i class='fas fa-snowflake'></i> TEMPS GELÉ pour l'adversaire !", 'info');
                     
                     // Arrêter le timer si l'adversaire est en train de jouer
                     if (game.activeTeam === 2) {
@@ -98,7 +98,7 @@ class PowerUp {
                         if (Date.now() >= game.frozenUntil) {
                             game.timeFrozen = false;
                             clearInterval(checkFrozen);
-                            UI.showMessage("⏱️ Le temps reprend !", 'info');
+                            UI.showMessage("<i class='fas fa-stopwatch'></i> Le temps reprend !", 'info');
                             
                             // Relancer le timer ou l'IA si c'est toujours le tour de l'adversaire
                             if (game.activeTeam === 2 && game.gameMode === 'pvai' && !game.isPaused) {
@@ -112,21 +112,21 @@ class PowerUp {
             },
             { 
                 id: 'rope_freeze',
-                name: "❄️ GEL DE CORDE", 
-                icon: "❄️",
+                name: "<i class='fas fa-snowflake'></i> GEL DE CORDE", 
+                icon: "<i class='fas fa-snowflake'></i>",
                 description: "L'adversaire ne marque pas au prochain point",
                 color: "#00cec9",
                 duration: 1,
                 applyEffect: (game) => {
                     game.ropeFrozen = true;
                     game.ropeFreezedTeam = game.activeTeam;
-                    UI.showMessage("❄️ GEL DE CORDE activé pour l'adversaire !", 'success');
+                    UI.showMessage("<i class='fas fa-snowflake'></i> GEL DE CORDE activé pour l'adversaire !", 'success');
                 }
             },
             { 
                 id: 'auto_answer',
-                name: "⚡ RÉPONSE AUTO", 
-                icon: "✨",
+                name: "<i class='fas fa-bolt'></i> RÉPONSE AUTO", 
+                icon: "<i class='fas fa-sparkles'></i>",
                 description: "La bonne réponse s'affiche !",
                 color: "#fdcb6e",
                 duration: 0,
@@ -134,13 +134,13 @@ class PowerUp {
                     const currentTeam = game.activeTeam === 1 ? game.team1 : game.team2;
                     currentTeam.setAnswer(currentTeam.currentOperation.result.toString());
                     UI.updateAnswerDisplay();
-                    UI.showMessage("✨ RÉPONSE AUTO activée !", 'success');
+                    UI.showMessage("<i class='fas fa-sparkles'></i> RÉPONSE AUTO activée !", 'success');
                 }
             },
             { 
                 id: 'speed_boost',
-                name: "🚀 TURBO", 
-                icon: "⚡",
+                name: "<i class='fas fa-rocket'></i> TURBO", 
+                icon: "<i class='fas fa-bolt'></i>",
                 description: "L'adversaire a moins de temps (50%)",
                 color: "#e17055",
                 duration: 10000,
@@ -148,7 +148,7 @@ class PowerUp {
                     game.opponentTimeReduced = true;
                     game.timeReduction = 0.5;
                     game.timeReductionUntil = Date.now() + 10000;
-                    UI.showMessage("🚀 TURBO activé ! L'adversaire est ralenti", 'info');
+                    UI.showMessage("<i class='fas fa-rocket'></i> TURBO activé ! L'adversaire est ralenti", 'info');
                     
                     // Si l'adversaire est en train de jouer, redémarrer son timer avec le nouveau temps
                     if (game.activeTeam === 2 && game.gameMode === 'pvai') {
@@ -172,15 +172,15 @@ class PowerUp {
             },
             { 
                 id: 'extra_life',
-                name: "❤️ VIE EXTRA", 
-                icon: "➕",
+                name: "<i class='fas fa-heart'></i> VIE EXTRA", 
+                icon: "<i class='fas fa-plus'></i>",
                 description: "Une chance en cas d'erreur",
                 color: "#ff4757",
                 duration: 1,
                 applyEffect: (game) => {
                     game.extraLife = true;
                     game.extraLifeTeam = game.activeTeam;
-                    UI.showMessage("❤️ VIE EXTRA ! Vous pouvez vous tromper sans perdre", 'success');
+                    UI.showMessage("<i class='fas fa-heart'></i> VIE EXTRA ! Vous pouvez vous tromper sans perdre", 'success');
                 }
             }
         ];
@@ -252,46 +252,46 @@ class Game {
 
         this.bonusInventories = {
             1: {
-                double_points: { count: 0, name: "💪 Double points", icon: "⭐", color: "#ffd700" },
-                extra_attempt: { count: 0, name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
-                rope_freeze: { count: 0, name: "❄️ Gel de corde", icon: "❄️", color: "#00cec9" },
-                steal_attempt: { count: 0, name: "⏱️ Vol de temps", icon: "⏱️", color: "#6c5ce7" },
-                time_bonus: { count: 0, name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
-                confusion: { count: 0, name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
+                double_points: { count: 0, name: "<i class='fas fa-dumbbell'></i> Double points", icon: "<i class='fas fa-star'></i>", color: "#ffd700" },
+                extra_attempt: { count: 0, name: "<i class='fas fa-plus'></i> Tentative sup", icon: "<i class='fas fa-plus'></i>", color: "#00cec9" },
+                rope_freeze: { count: 0, name: "<i class='fas fa-snowflake'></i> Gel de corde", icon: "<i class='fas fa-snowflake'></i>", color: "#00cec9" },
+                steal_attempt: { count: 0, name: "<i class='fas fa-stopwatch'></i> Vol de temps", icon: "<i class='fas fa-stopwatch'></i>", color: "#6c5ce7" },
+                time_bonus: { count: 0, name: "<i class='fas fa-stopwatch'></i> Temps bonus", icon: "<i class='fas fa-stopwatch'></i>", color: "#fdcb6e" },
+                confusion: { count: 0, name: "<i class='fas fa-dizzy'></i> Confusion", icon: "<i class='fas fa-dizzy'></i>", color: "#e17055" }
             },
             2: {
-                double_points: { count: 0, name: "💪 Double points", icon: "⭐", color: "#ffd700" },
-                extra_attempt: { count: 0, name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
-                rope_freeze: { count: 0, name: "❄️ Gel de corde", icon: "❄️", color: "#00cec9" },
-                steal_attempt: { count: 0, name: "⏱️ Vol de temps", icon: "⏱️", color: "#6c5ce7" },
-                time_bonus: { count: 0, name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
-                confusion: { count: 0, name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
+                double_points: { count: 0, name: "<i class='fas fa-dumbbell'></i> Double points", icon: "<i class='fas fa-star'></i>", color: "#ffd700" },
+                extra_attempt: { count: 0, name: "<i class='fas fa-plus'></i> Tentative sup", icon: "<i class='fas fa-plus'></i>", color: "#00cec9" },
+                rope_freeze: { count: 0, name: "<i class='fas fa-snowflake'></i> Gel de corde", icon: "<i class='fas fa-snowflake'></i>", color: "#00cec9" },
+                steal_attempt: { count: 0, name: "<i class='fas fa-stopwatch'></i> Vol de temps", icon: "<i class='fas fa-stopwatch'></i>", color: "#6c5ce7" },
+                time_bonus: { count: 0, name: "<i class='fas fa-stopwatch'></i> Temps bonus", icon: "<i class='fas fa-stopwatch'></i>", color: "#fdcb6e" },
+                confusion: { count: 0, name: "<i class='fas fa-dizzy'></i> Confusion", icon: "<i class='fas fa-dizzy'></i>", color: "#e17055" }
             }
         };
 
         this.bonusTypes = [
-            { id: 'double_points', name: "💪 Double points", icon: "⭐", description: "Double les points pour 1 tour", color: "#ffd700" },
-            { id: 'extra_attempt', name: "➕ Tentative sup", icon: "➕", description: "Gagne 1 tentative supplémentaire", color: "#00cec9" },
-            { id: 'rope_freeze', name: "❄️ Gel de corde", icon: "❄️", description: "Bloque le prochain point adverse", color: "#00cec9" },
-            { id: 'steal_attempt', name: "⏱️ Vol de temps", icon: "⏱️", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
-            { id: 'time_bonus', name: "⏱️ Temps bonus", icon: "⏱️", description: "+5 secondes au chrono", color: "#fdcb6e" },
-            { id: 'confusion', name: "🌀 Confusion", icon: "🌀", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
+            { id: 'double_points', name: "<i class='fas fa-dumbbell'></i> Double points", icon: "<i class='fas fa-star'></i>", description: "Double les points pour 1 tour", color: "#ffd700" },
+            { id: 'extra_attempt', name: "<i class='fas fa-plus'></i> Tentative sup", icon: "<i class='fas fa-plus'></i>", description: "Gagne 1 tentative supplémentaire", color: "#00cec9" },
+            { id: 'rope_freeze', name: "<i class='fas fa-snowflake'></i> Gel de corde", icon: "<i class='fas fa-snowflake'></i>", description: "Bloque le prochain point adverse", color: "#00cec9" },
+            { id: 'steal_attempt', name: "<i class='fas fa-stopwatch'></i> Vol de temps", icon: "<i class='fas fa-stopwatch'></i>", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
+            { id: 'time_bonus', name: "<i class='fas fa-stopwatch'></i> Temps bonus", icon: "<i class='fas fa-stopwatch'></i>", description: "+5 secondes au chrono", color: "#fdcb6e" },
+            { id: 'confusion', name: "<i class='fas fa-dizzy'></i> Confusion", icon: "<i class='fas fa-dizzy'></i>", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
         ];
 
         this.bonusActions = {
             double_points: (game) => {
                 game.pointMultiplier = 2;
-                UI.showMessage("💪 Double points activé !", 'success');
+                UI.showMessage("<i class='fas fa-dumbbell'></i> Double points activé !", 'success');
             },
             extra_attempt: (game, team) => {
                 game.attempts[team]++;
                 UI.updateAttempts();
-                UI.showMessage("➕ Tentative supplémentaire !", 'success');
+                UI.showMessage("<i class='fas fa-plus'></i> Tentative supplémentaire !", 'success');
             },
             rope_freeze: (game, team) => {
                 game.ropeFrozen = true;
                 game.ropeFreezedTeam = team;
-                UI.showMessage("❄️ Gel de corde activé !", 'success');
+                UI.showMessage("<i class='fas fa-snowflake'></i> Gel de corde activé !", 'success');
             },
             steal_attempt: (game, team) => {
                 const opponent = team === 1 ? 2 : 1;
@@ -299,20 +299,20 @@ class Game {
                     game.attempts[opponent]--;
                     game.attempts[team]++;
                     UI.updateAttempts();
-                    UI.showMessage(`👻 Tentative volée à l'adversaire !`, 'success');
+                    UI.showMessage(`<i class='fas fa-ghost'></i> Tentative volée à l'adversaire !`, 'success');
                 }
             },
             time_bonus: (game) => {
                 game.timeLeft += 5;
                 UI.updateTimerDisplay();
-                UI.showMessage("⏱️ +5 secondes !", 'success');
+                UI.showMessage("<i class='fas fa-stopwatch'></i> +5 secondes !", 'success');
             },
             confusion: (game, team) => {
                 const opponent = team === 1 ? 2 : 1;
                 if (game.attempts[opponent] > 0) {
                     game.attempts[opponent]--;
                     UI.updateAttempts();
-                    UI.showMessage(`🌀 L'adversaire perd une tentative !`, 'success');
+                    UI.showMessage(`<i class='fas fa-dizzy'></i> L'adversaire perd une tentative !`, 'success');
                 }
             }
         };
@@ -331,7 +331,7 @@ class Game {
             const randomBonus = bonusTypes[Math.floor(Math.random() * bonusTypes.length)];
             this.bonusInventories[team][randomBonus.id].count++;
             UI.updateBonusIcons(this.bonusInventories); // transmettre les deux inventaires
-            UI.showMessage(`✨ Bonus obtenu pour ${team === 1 ? 'Équipe Rouge' : 'Équipe Bleue'} : ${randomBonus.name} !`, 'success');
+            // Removed bonus obtained notification
         }
     }
 
@@ -353,32 +353,32 @@ class Game {
         switch(bonusId) {
             case 'double_points':
                 this.pointMultiplier = 2;
-                UI.showMessage("💪 Double points activé !", 'success');
+                UI.showMessage("<i class='fas fa-dumbbell'></i> Double points activé !", 'success');
                 break;
 
             case 'extra_attempt':
                 this.attempts[team]++;
                 UI.updateAttempts();
-                UI.showMessage("➕ Tentative supplémentaire !", 'success');
+                UI.showMessage("<i class='fas fa-plus'></i> Tentative supplémentaire !", 'success');
                 break;
 
             case 'rope_freeze':
                 this.ropeFrozen = true;
                 this.ropeFreezedTeam = team;
-                UI.showMessage("❄️ Gel de corde activé ! L'adversaire ne marquera pas au prochain point.", 'success');
+                UI.showMessage("<i class='fas fa-snowflake'></i> Gel de corde activé ! L'adversaire ne marquera pas au prochain point.", 'success');
                 break;
 
             case 'steal_attempt': // Vol de temps
                 // Programmer le vol de temps pour l'adversaire au début de son prochain tour
                 this.pendingTimeSteals.push({ target: opponent, amount: 5, from: team });
-                UI.showMessage(`⏱️ Vol de temps programmé pour l'adversaire (-5s) !`, 'success');
+                UI.showMessage(`<i class='fas fa-stopwatch'></i> Vol de temps programmé pour l'adversaire (-5s) !`, 'success');
                 UI.showScheduledEffect(team, 'steal_attempt');
                 break;
 
             case 'time_bonus':
                 this.timeLeft += 5;
                 this.updateTimerDisplay();
-                UI.showMessage("⏱️ +5 secondes !", 'success');
+                UI.showMessage("<i class='fas fa-stopwatch'></i> +5 secondes !", 'success');
                 break;
 
             case 'confusion': {
@@ -388,7 +388,7 @@ class Game {
                     const newOp = this.generateConfusingOperation(originalResult);
                     // Ne pas remplacer l'opération réelle : stocker l'illusion pour le prochain tour de l'adversaire
                     this.pendingConfusions.push({ target: opponent, ghostOp: newOp, originalOp: { ...advTeam.currentOperation } });
-                    UI.showMessage(`🌀 Confusion programmée pour l'adversaire (illusion stockée) !`, 'success');
+                    UI.showMessage(`<i class='fas fa-dizzy'></i> Confusion programmée pour l'adversaire (illusion stockée) !`, 'success');
                     UI.showScheduledEffect(team, 'confusion');
                 } else {
                     UI.showMessage("Impossible de perturber : l'adversaire n'a pas d'opération active.", 'warning');
@@ -722,7 +722,7 @@ class Game {
                     UI.updateQuestion(this.activeTeam, conf.ghostOp.text);
                     // Marquer le ghost comme actif (pour que l'IA puisse s'y faire piéger)
                     this.activeGhosts[this.activeTeam] = { ghostOp: conf.ghostOp, originalOp: conf.originalOp };
-                    UI.showMessage('🌀 Illusion affichée : attention à la vraie question !', 'warning');
+                    UI.showMessage('<i class="fas fa-dizzy"></i> Illusion affichée : attention à la vraie question !', 'warning');
                 }, 1000);
             }
 
@@ -743,7 +743,7 @@ class Game {
                     let total = 0;
                     stealsForActive.forEach(s => { total += s.amount; });
                     this.timeLeft = Math.max(0, this.timeLeft - total);
-                    UI.showMessage(`⏱️ Vol de temps appliqué : -${total}s pour ${this.activeTeam === 1 ? this.team1.name : this.team2.name}`, 'info');
+                    UI.showMessage(`<i class="fas fa-stopwatch"></i> Vol de temps appliqué : -${total}s pour ${this.activeTeam === 1 ? this.team1.name : this.team2.name}`, 'info');
                     this.pendingTimeSteals = this.pendingTimeSteals.filter(s => s.target !== this.activeTeam);
                     this.updateTimerDisplay();
                     UI.updateTimerBar(this.timeLeft, this.maxTime);
@@ -760,7 +760,7 @@ class Game {
                     stealsForActive2.forEach(s => { total += s.amount; });
                     this.timeLeft = Math.max(0, timeLimit - total);
                     this.maxTime = timeLimit;
-                    UI.showMessage(`⏱️ Vol de temps appliqué : -${total}s pour ${this.activeTeam === 1 ? this.team1.name : this.team2.name}`, 'info');
+                    UI.showMessage(`<i class="fas fa-stopwatch"></i> Vol de temps appliqué : -${total}s pour ${this.activeTeam === 1 ? this.team1.name : this.team2.name}`, 'info');
                     this.pendingTimeSteals = this.pendingTimeSteals.filter(s => s.target !== this.activeTeam);
                     this.updateTimerDisplay();
                     UI.updateTimerBar(this.timeLeft, this.maxTime);
@@ -779,7 +779,7 @@ class Game {
             if (stealsForActive2.length > 0) {
                 stealsForActive2.forEach(s => {
                     this.timeLeft = Math.max(0, (typeof this.timeLeft === 'number' && this.timeLeft > 0 ? this.timeLeft : CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit) - s.amount);
-                    UI.showMessage(`⏱️ Vol de temps appliqué : -${s.amount}s pour l'IA`, 'info');
+                    UI.showMessage(`<i class="fas fa-stopwatch"></i> Vol de temps appliqué : -${s.amount}s pour l'IA`, 'info');
                 });
                 this.pendingTimeSteals = this.pendingTimeSteals.filter(s => s.target !== 2);
                 this.updateTimerDisplay();
@@ -792,7 +792,7 @@ class Game {
                 setTimeout(() => {
                     UI.updateQuestion(2, conf.ghostOp.text);
                     this.activeGhosts[2] = { ghostOp: conf.ghostOp, originalOp: conf.originalOp };
-                    UI.showMessage('🌀 Illusion affichée pour l\'IA (ne change pas la vraie réponse)', 'warning');
+                    UI.showMessage('<i class="fas fa-dizzy"></i> Illusion affichée pour l\'IA (ne change pas la vraie réponse)', 'warning');
                 }, 1000);
             }
             this.startIA();
@@ -834,7 +834,7 @@ class Game {
             // Déplacer la corde (avec multiplicateur) SAUF si elle est gelée pour cette équipe
             if (this.ropeFrozen && this.ropeFreezedTeam !== this.activeTeam) {
                 // L'adversaire a activé le gel contre nous : la corde ne bouge pas
-                UI.showMessage("❄️ La corde est gelée ! Vos points ne comptent pas cette fois.", 'warning');
+                UI.showMessage("<i class='fas fa-snowflake'></i> La corde est gelée ! Vos points ne comptent pas cette fois.", 'warning');
                 this.ropeFrozen = false;
                 this.ropeFreezedTeam = null;
             } else {
@@ -874,7 +874,7 @@ class Game {
             // Vérification de la vie extra
             if (this.extraLife && this.extraLifeTeam === this.activeTeam) {
                 this.extraLife = false;
-                UI.showMessage("❤️ Vie extra utilisée !", 'success');
+                UI.showMessage("<i class='fas fa-heart'></i> Vie extra utilisée !", 'success');
                 this.waitingForAnswer = false;
                 currentTeam.clearAnswer();
                 UI.clearAnswerDisplay();
@@ -886,7 +886,7 @@ class Game {
             this.attempts[this.activeTeam]--;
             UI.updateAttempts();
             
-            UI.showMessage(`Mauvaise réponse ! Tentatives restantes: ${this.attempts[this.activeTeam]}`, 'error');
+            // Removed error notification
             
             if (this.attempts[this.activeTeam] <= 0) {
                 // Plus de tentatives, passage à l'adversaire
@@ -977,10 +977,10 @@ class Game {
         // Ajouter la manche gagnée
         if (team === 1) {
             this.team1.winRound();
-            UI.showMessage(`${this.team1.name} remporte la manche ! 🏆`, 'success');
+            UI.showMessage(`${this.team1.name} remporte la manche ! <i class="fas fa-trophy"></i>`, 'success');
         } else {
             this.team2.winRound();
-            UI.showMessage(`${this.gameMode === 'pvai' ? 'IA' : this.team2.name} remporte la manche ! 🏆`, 'success');
+            UI.showMessage(`${this.gameMode === 'pvai' ? 'IA' : this.team2.name} remporte la manche ! <i class="fas fa-trophy"></i>`, 'success');
         }
         
         UI.updateScores();
@@ -1134,7 +1134,7 @@ class Game {
             // L'IA fait une erreur
             const wrongAnswer = currentTeam.currentOperation.result + Math.floor(Math.random() * 5) + 1;
             currentTeam.setAnswer(wrongAnswer.toString());
-            UI.showMessage("L'IA a fait une erreur !", 'error');
+            // Removed IA error notification
             
             // IMPORTANT: L'IA utilise une tentative même en erreur
             this.attempts[2]--;
@@ -1203,10 +1203,10 @@ class Game {
     }
 
     testAddBonus() {
-        const testBonus = { id: 'double_points', name: "💪 Double points", icon: "⭐", color: "#ffd700" };
+        const testBonus = { id: 'double_points', name: "<i class='fas fa-dumbbell'></i> Double points", icon: "<i class='fas fa-star'></i>", color: "#ffd700" };
         this.bonusInventories[this.activeTeam][testBonus.id].count++;
         UI.updateBonusIcons(this.bonusInventories);
-        UI.showMessage(`✨ Bonus de test ajouté !`, 'success');
+        UI.showMessage(`<i class="fas fa-sparkles"></i> Bonus de test ajouté !`, 'success');
     }
 
     tryUseBonusIA() {
@@ -1557,7 +1557,7 @@ class UI {
         
         if (game) {
             const teamName = team === 1 ? game.team1.name : (game.gameMode === 'pvai' && team === 2 ? 'IA' : game.team2.name);
-            this.showMessage(`Au tour de ${teamName} !`, 'info');
+            // Removed turn notification
         }
     }
 
@@ -2076,11 +2076,11 @@ class UI {
         }
         
         const activePowerUps = [];
-        if (game.pointMultiplier > 1) activePowerUps.push("💪 Double points");
-        if (game.timeFrozen) activePowerUps.push("❄️ Temps gelé");
-        if (game.ropeFrozen) activePowerUps.push("❄️ Gel de corde");
-        if (game.extraLife) activePowerUps.push("❤️ Vie extra");
-        if (game.opponentTimeReduced) activePowerUps.push("🚀 Turbo actif");
+        if (game.pointMultiplier > 1) activePowerUps.push("<i class='fas fa-dumbbell'></i> Double points");
+        if (game.timeFrozen) activePowerUps.push("<i class='fas fa-snowflake'></i> Temps gelé");
+        if (game.ropeFrozen) activePowerUps.push("<i class='fas fa-snowflake'></i> Gel de corde");
+        if (game.extraLife) activePowerUps.push("<i class='fas fa-heart'></i> Vie extra");
+        if (game.opponentTimeReduced) activePowerUps.push("<i class='fas fa-rocket'></i> Turbo actif");
         
         if (activePowerUps.length > 0) {
             indicator.innerHTML = `
