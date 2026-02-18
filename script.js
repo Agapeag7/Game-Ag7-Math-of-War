@@ -321,12 +321,12 @@ class Game {
     tryAddBonus(team) {
         if (Math.random() < 0.4) {
             const bonusTypes = [
-                { id: 'double_points', name: "💪 Double points", icon: "⭐", color: "#ffd700" },
-                { id: 'extra_attempt', name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
-                { id: 'rope_freeze', name: "❄️ Gel de corde", icon: "❄️", color: "#00cec9" },
-                { id: 'steal_attempt', name: "⏱️ Vol de temps", icon: "⏱️", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
-                { id: 'time_bonus', name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
-                { id: 'confusion', name: "🌀 Confusion", icon: "🌀", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
+                { id: 'double_points', name: "<i class='fas fa-dumbbell'></i> Double points", icon: "<i class='fas fa-star'></i>", color: "#ffd700" },
+                { id: 'extra_attempt', name: "<i class='fas fa-plus'></i> Tentative sup", icon: "<i class='fas fa-plus'></i>", color: "#00cec9" },
+                { id: 'rope_freeze', name: "<i class='fas fa-snowflake'></i> Gel de corde", icon: "<i class='fas fa-snowflake'></i>", color: "#00cec9" },
+                { id: 'steal_attempt', name: "<i class='fas fa-stopwatch'></i> Vol de temps", icon: "<i class='fas fa-stopwatch'></i>", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
+                { id: 'time_bonus', name: "<i class='fas fa-stopwatch'></i> Temps bonus", icon: "<i class='fas fa-stopwatch'></i>", color: "#fdcb6e" },
+                { id: 'confusion', name: "<i class='fas fa-dizzy'></i> Confusion", icon: "<i class='fas fa-dizzy'></i>", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
             ];
             const randomBonus = bonusTypes[Math.floor(Math.random() * bonusTypes.length)];
             this.bonusInventories[team][randomBonus.id].count++;
@@ -669,7 +669,7 @@ class Game {
     handleTimeout() {
         if (this.waitingForAnswer) return;
         
-        UI.showMessage(`Temps écoulé pour ${this.activeTeam === 1 ? this.team1.name : (this.gameMode === 'pvai' && this.activeTeam === 2 ? 'IA' : this.team2.name)} !`, 'warning');
+        // Removed timeout notification
         this.switchTeam();
         this.prepareNextTurn();
     }
@@ -823,7 +823,7 @@ class Game {
         if (currentTeam.isCorrect()) {
             // Bonne réponse
             UI.showEffect('correct', this.activeTeam);
-            UI.showMessage("Bonne réponse ! 🎉", 'success');
+            UI.showMessage("Bonne réponse ! <i class='fas fa-check-circle'></i>", 'success');
             
             // Jouer un son (optionnel)
             UI.playSound('correct');
@@ -1105,7 +1105,7 @@ class Game {
             // L'IA répond selon la question fantôme (généralement incorrecte)
             const ghostAnswer = activeGhost.ghostOp.result;
             currentTeam.setAnswer(ghostAnswer.toString());
-            UI.showMessage("L'IA s'est fait piéger par l'illusion !", 'error');
+            // Removed IA error notification
             // L'IA utilise une tentative
             this.attempts[2]--;
             UI.updateAttempts();
@@ -1159,7 +1159,7 @@ class Game {
         } else {
             // L'IA répond correctement
             currentTeam.setAnswer(currentTeam.currentOperation.result.toString());
-            UI.showMessage("L'IA a trouvé la réponse !", 'success');
+            // Removed IA success notification
             // Nettoyer un éventuel ghost (si présent mais non tombé)
             if (this.activeGhosts[2]) delete this.activeGhosts[2];
             // Traiter la bonne réponse (qui gère déjà les tentatives)
@@ -1842,8 +1842,11 @@ class UI {
         this.ropeCenter.style.transition = 'left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
         this.ropeCenter.style.left = newLeft;
         
+        // Update rope visual split (gradient) based on position
+        this.updateRopeGradient(position, maxSteps);
         this.updateRopeTension(position, maxSteps);
         this.animateTeamIndicators(position);
+        this.updateRopeCharacters(position, maxSteps);
         
         if (Math.abs(position) > maxSteps * 0.7) {
             this.ropeCenter.classList.add('rope-glow');
@@ -1882,6 +1885,45 @@ class UI {
                 leftStrain.remove();
                 rightStrain.remove();
             }, 300);
+        }
+    }
+
+    static updateRopeGradient(position, maxSteps) {
+        const ropeEl = document.querySelector('.rope');
+        if (!ropeEl) return;
+
+        // Split percent moves with position. Clamp between 10% and 90% for visual balance
+        const raw = 50 + (position / maxSteps) * 40; // range ~10..90
+        const split = Math.max(10, Math.min(90, raw));
+
+        const leftColor = getComputedStyle(document.documentElement).getPropertyValue('--team1-color') || '#ff4757';
+        const rightColor = getComputedStyle(document.documentElement).getPropertyValue('--team2-color') || '#1e90ff';
+
+        ropeEl.style.transition = 'background 0.45s ease';
+        ropeEl.style.background = `linear-gradient(90deg, ${leftColor} 0%, ${leftColor} ${split}%, ${rightColor} ${split}%, ${rightColor} 100%)`;
+    }
+
+    static updateRopeCharacters(position, maxSteps) {
+        // Animate decorative puller icons slightly based on rope position
+        const left = document.querySelector('.left-puller');
+        const right = document.querySelector('.right-puller');
+        if (!left || !right) return;
+
+        const strength = Math.max(-1, Math.min(1, position / maxSteps));
+        // left moves left when position negative (team1 advantage), right moves opposite
+        const leftOffset = Math.round(-strength * 12); // px
+        const rightOffset = Math.round(-strength * -12);
+
+        left.style.transform = `translateY(-50%) translateX(${leftOffset}px) rotate(${leftOffset/2}deg)`;
+        right.style.transform = `translateY(-50%) translateX(${rightOffset}px) rotate(${rightOffset/2}deg)`;
+
+        // Add a small pull visual when strong
+        if (Math.abs(position) > maxSteps * 0.6) {
+            left.classList.add('pull-strong');
+            right.classList.add('pull-strong');
+        } else {
+            left.classList.remove('pull-strong');
+            right.classList.remove('pull-strong');
         }
     }
 
@@ -2012,7 +2054,7 @@ class UI {
         const container = document.createElement('div');
         container.className = 'scheduled-effect-toast';
         const isLeft = team === 1;
-        const icon = effectId === 'confusion' ? '🌀' : '⏱️';
+        const icon = effectId === 'confusion' ? "<i class='fas fa-dizzy'></i>" : "<i class='fas fa-stopwatch'></i>";
         const label = effectId === 'confusion' ? 'Illusion programmée' : 'Vol de temps programmé';
 
         container.innerHTML = `
@@ -2121,7 +2163,7 @@ class UI {
             const leftBonus = document.createElement('div');
             leftBonus.id = 'bonus-left';
             leftBonus.className = 'bonus-side left';
-            leftBonus.dataset.team = '🔴 Équipe Rouge';
+            leftBonus.dataset.team = 'Équipe Rouge';
             leftBonus.style.display = 'none'; // Caché par défaut
             document.body.appendChild(leftBonus);
             this.bonusLeft = leftBonus;
@@ -2131,7 +2173,7 @@ class UI {
             const rightBonus = document.createElement('div');
             rightBonus.id = 'bonus-right';
             rightBonus.className = 'bonus-side right';
-            rightBonus.dataset.team = '🔵 Équipe Bleue';
+            rightBonus.dataset.team = 'Équipe Bleue';
             rightBonus.style.display = 'none';
             document.body.appendChild(rightBonus);
             this.bonusRight = rightBonus;
@@ -2180,7 +2222,7 @@ class UI {
         const activeBonuses = Object.entries(inventory).filter(([_, bonus]) => bonus.count > 0);
         
         if (activeBonuses.length === 0) {
-            container.innerHTML = '<span class="no-bonus-message">🎁</span>';
+            container.innerHTML = '<span class="no-bonus-message"><i class="fas fa-gift"></i></span>';
             return;
         }
         

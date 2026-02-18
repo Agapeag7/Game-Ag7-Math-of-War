@@ -78,7 +78,7 @@
                                 <div class="card-desc">Tout mélangé</div>
                             </div>
                             <div class="difficulty-card" data-difficulty="6">
-                                <div class="card-icon"><i class="fas fa-stopwatch"></i></div>
+                                <div class="card-icon"><i class='fas fa-stopwatch'></i></div>
                                 <div class="card-title">Chronométré</div>
                                 <div class="card-desc">10 secondes</div>
                             </div>
@@ -147,11 +147,15 @@
             <div class="tug-of-war-area">
                 <div class="rope-container">
                     <div class="rope"></div>
-                    <div class="rope-center" id="rope-center">⚡</div>
+                    <div class="rope-characters">
+                        <div class="left-puller"><i class="fas fa-user-astronaut"></i></div>
+                        <div class="right-puller"><i class="fas fa-user-astronaut"></i></div>
+                    </div>
+                    <div class="rope-center" id="rope-center"><i class="fas fa-bolt rope-icon"></i></div>
                 </div>
                 <div class="teams-indicators">
-                    <div class="team-indicator team1-indicator">🔴</div>
-                    <div class="team-indicator team2-indicator">🔵</div>
+                    <div class="team-indicator team1-indicator"><i class="fas fa-user team-player team1-player"></i></div>
+                    <div class="team-indicator team2-indicator"><i class="fas fa-user team-player team2-player"></i></div>
                 </div>
             </div>
 
@@ -169,8 +173,8 @@
 
             <div class="bonus-bar">
                 <div class="attempts-compact">
-                    <span class="attempts-team1">🔴 <span id="attempts-1">2</span></span>
-                    <span class="attempts-team2">🔵 <span id="attempts-2">2</span></span>
+                    <span class="attempts-team1"><i class="fas fa-circle attempts-dot team1-dot"></i> <span id="attempts-1">2</span></span>
+                    <span class="attempts-team2"><i class="fas fa-circle attempts-dot team2-dot"></i> <span id="attempts-2">2</span></span>
                 </div>
             </div>
 
@@ -248,7 +252,7 @@
         <!-- Écran de victoire -->
         <div id="victory-screen" class="screen">
             <div id="victory-message" style="font-size: 3rem; color: white; margin-bottom: 40px; text-shadow: 3px 3px 6px rgba(0,0,0,0.5);">
-                🏆 Victoire ! 🏆
+                <i class="fas fa-trophy"></i> Victoire ! <i class="fas fa-trophy"></i>
             </div>
             <div id="confetti-container" class="confetti"></div>
             <div class="victory-buttons" style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
