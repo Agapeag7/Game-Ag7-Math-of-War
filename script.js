@@ -273,7 +273,7 @@ class Game {
             { id: 'double_points', name: "<i class='fas fa-dumbbell'></i> Double points", icon: "<i class='fas fa-star'></i>", description: "Double les points pour 1 tour", color: "#ffd700" },
             { id: 'extra_attempt', name: "<i class='fas fa-plus'></i> Tentative sup", icon: "<i class='fas fa-plus'></i>", description: "Gagne 1 tentative supplémentaire", color: "#00cec9" },
             { id: 'rope_freeze', name: "<i class='fas fa-snowflake'></i> Gel de corde", icon: "<i class='fas fa-snowflake'></i>", description: "Bloque le prochain point adverse", color: "#00cec9" },
-            { id: 'steal_attempt', name: "<i class='fas fa-stopwatch'></i> Vol de temps", icon: "<i class='fas fa-stopwatch'></i>", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
+            { id: 'steal_attempt', name: "<i class='fas fa-stopwatch'></i> Vol de temps", icon: "<i class='fas fa-stopwatch'></i>", description: "Réduit le temps de l'adversaire (selon la difficulté)", color: "#6c5ce7" },
             { id: 'time_bonus', name: "<i class='fas fa-stopwatch'></i> Temps bonus", icon: "<i class='fas fa-stopwatch'></i>", description: "+5 secondes au chrono", color: "#fdcb6e" },
             { id: 'confusion', name: "<i class='fas fa-dizzy'></i> Confusion", icon: "<i class='fas fa-dizzy'></i>", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
         ];
@@ -324,7 +324,7 @@ class Game {
                 { id: 'double_points', name: "<i class='fas fa-dumbbell'></i> Double points", icon: "<i class='fas fa-star'></i>", color: "#ffd700" },
                 { id: 'extra_attempt', name: "<i class='fas fa-plus'></i> Tentative sup", icon: "<i class='fas fa-plus'></i>", color: "#00cec9" },
                 { id: 'rope_freeze', name: "<i class='fas fa-snowflake'></i> Gel de corde", icon: "<i class='fas fa-snowflake'></i>", color: "#00cec9" },
-                { id: 'steal_attempt', name: "<i class='fas fa-stopwatch'></i> Vol de temps", icon: "<i class='fas fa-stopwatch'></i>", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
+                { id: 'steal_attempt', name: "<i class='fas fa-stopwatch'></i> Vol de temps", icon: "<i class='fas fa-stopwatch'></i>", description: "Réduit le temps de l'adversaire (selon la difficulté)", color: "#6c5ce7" },
                 { id: 'time_bonus', name: "<i class='fas fa-stopwatch'></i> Temps bonus", icon: "<i class='fas fa-stopwatch'></i>", color: "#fdcb6e" },
                 { id: 'confusion', name: "<i class='fas fa-dizzy'></i> Confusion", icon: "<i class='fas fa-dizzy'></i>", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
             ];
@@ -370,8 +370,11 @@ class Game {
 
             case 'steal_attempt': // Vol de temps
                 // Programmer le vol de temps pour l'adversaire au début de son prochain tour
-                this.pendingTimeSteals.push({ target: opponent, amount: 5, from: team });
-                UI.showMessage(`<i class='fas fa-stopwatch'></i> Vol de temps programmé pour l'adversaire (-5s) !`, 'success');
+                // Montant proportionnel au temps alloué par niveau de difficulté (70% demandé)
+                const timeLimitForDifficulty = CONFIG.DIFFICULTY_SETTINGS[this.currentDifficulty].timeLimit || 5;
+                const stealAmount = Math.max(1, Math.round(timeLimitForDifficulty * 0.7));
+                this.pendingTimeSteals.push({ target: opponent, amount: stealAmount, from: team });
+                UI.showMessage(`<i class='fas fa-stopwatch'></i> Vol de temps programmé pour l'adversaire (-${stealAmount}s) !`, 'success');
                 UI.showScheduledEffect(team, 'steal_attempt');
                 break;
 
