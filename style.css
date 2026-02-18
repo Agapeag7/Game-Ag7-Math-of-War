@@ -1618,9 +1618,17 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     }
 
     .bonus-side {
-        width: 100px; /* Réduire la largeur */
-        padding: 10px 8px;
-        top: 100px; /* Ajuster la position verticale */
+        width: 60px; /* Réduire drastiquement la largeur pour ne montrer que les icônes */
+        padding: 8px 4px;
+        top: 100px;
+    }
+
+    .bonus-side .bonus-icons {
+        gap: 4px; /* Réduire l'espacement */
+    }
+
+    .bonus-icon-item {
+        padding: 4px; /* Padding minimal */
     }
 
     .bonus-bar {
@@ -1927,9 +1935,17 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     }
 
     .bonus-side {
-        width: 80px; /* Très étroit */
-        padding: 8px 6px;
-        top: 90px; /* Position plus haute */
+        width: 50px; /* Ultra étroit pour ne montrer que les icônes */
+        padding: 6px 3px;
+        top: 90px;
+    }
+
+    .bonus-side .bonus-icons {
+        gap: 3px; /* Espacement minimal */
+    }
+
+    .bonus-icon-item {
+        padding: 3px; /* Padding minimal */
     }
 
     .bonus-container {
