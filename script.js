@@ -111,16 +111,16 @@ class PowerUp {
                 }
             },
             { 
-                id: 'shield',
-                name: "🛡️ BOUCLIER", 
-                icon: "🛡️",
-                description: "Protège contre une mauvaise réponse",
-                color: "#0984e3",
+                id: 'rope_freeze',
+                name: "❄️ GEL DE CORDE", 
+                icon: "❄️",
+                description: "L'adversaire ne marque pas au prochain point",
+                color: "#00cec9",
                 duration: 1,
                 applyEffect: (game) => {
-                    game.shieldActive = true;
-                    game.shieldTeam = game.activeTeam;
-                    UI.showMessage("🛡️ BOUCLIER activé !", 'success');
+                    game.ropeFrozen = true;
+                    game.ropeFreezedTeam = game.activeTeam;
+                    UI.showMessage("❄️ GEL DE CORDE activé pour l'adversaire !", 'success');
                 }
             },
             { 
@@ -232,8 +232,8 @@ class Game {
         this.pointMultiplier = 1;
         this.timeFrozen = false;
         this.frozenUntil = 0;
-        this.shieldActive = false;
-        this.shieldTeam = null;
+        this.ropeFrozen = false;
+        this.ropeFreezedTeam = null;
         this.extraLife = false;
         this.extraLifeTeam = null;
         this.confusionActive = false;
@@ -254,7 +254,7 @@ class Game {
             1: {
                 double_points: { count: 0, name: "💪 Double points", icon: "⭐", color: "#ffd700" },
                 extra_attempt: { count: 0, name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
-                shield: { count: 0, name: "🛡️ Bouclier", icon: "🛡️", color: "#0984e3" },
+                rope_freeze: { count: 0, name: "❄️ Gel de corde", icon: "❄️", color: "#00cec9" },
                 steal_attempt: { count: 0, name: "⏱️ Vol de temps", icon: "⏱️", color: "#6c5ce7" },
                 time_bonus: { count: 0, name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
                 confusion: { count: 0, name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
@@ -262,7 +262,7 @@ class Game {
             2: {
                 double_points: { count: 0, name: "💪 Double points", icon: "⭐", color: "#ffd700" },
                 extra_attempt: { count: 0, name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
-                shield: { count: 0, name: "🛡️ Bouclier", icon: "🛡️", color: "#0984e3" },
+                rope_freeze: { count: 0, name: "❄️ Gel de corde", icon: "❄️", color: "#00cec9" },
                 steal_attempt: { count: 0, name: "⏱️ Vol de temps", icon: "⏱️", color: "#6c5ce7" },
                 time_bonus: { count: 0, name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
                 confusion: { count: 0, name: "🌀 Confusion", icon: "🌀", color: "#e17055" }
@@ -272,7 +272,7 @@ class Game {
         this.bonusTypes = [
             { id: 'double_points', name: "💪 Double points", icon: "⭐", description: "Double les points pour 1 tour", color: "#ffd700" },
             { id: 'extra_attempt', name: "➕ Tentative sup", icon: "➕", description: "Gagne 1 tentative supplémentaire", color: "#00cec9" },
-            { id: 'shield', name: "🛡️ Bouclier", icon: "🛡️", description: "Protège contre 1 erreur", color: "#0984e3" },
+            { id: 'rope_freeze', name: "❄️ Gel de corde", icon: "❄️", description: "Bloque le prochain point adverse", color: "#00cec9" },
             { id: 'steal_attempt', name: "⏱️ Vol de temps", icon: "⏱️", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
             { id: 'time_bonus', name: "⏱️ Temps bonus", icon: "⏱️", description: "+5 secondes au chrono", color: "#fdcb6e" },
             { id: 'confusion', name: "🌀 Confusion", icon: "🌀", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
@@ -288,10 +288,10 @@ class Game {
                 UI.updateAttempts();
                 UI.showMessage("➕ Tentative supplémentaire !", 'success');
             },
-            shield: (game, team) => {
-                game.shieldActive = true;
-                game.shieldTeam = team;
-                UI.showMessage("🛡️ Bouclier activé !", 'success');
+            rope_freeze: (game, team) => {
+                game.ropeFrozen = true;
+                game.ropeFreezedTeam = team;
+                UI.showMessage("❄️ Gel de corde activé !", 'success');
             },
             steal_attempt: (game, team) => {
                 const opponent = team === 1 ? 2 : 1;
@@ -323,7 +323,7 @@ class Game {
             const bonusTypes = [
                 { id: 'double_points', name: "💪 Double points", icon: "⭐", color: "#ffd700" },
                 { id: 'extra_attempt', name: "➕ Tentative sup", icon: "➕", color: "#00cec9" },
-                { id: 'shield', name: "🛡️ Bouclier", icon: "🛡️", color: "#0984e3" },
+                { id: 'rope_freeze', name: "❄️ Gel de corde", icon: "❄️", color: "#00cec9" },
                 { id: 'steal_attempt', name: "⏱️ Vol de temps", icon: "⏱️", description: "Réduit le temps de l'adversaire de 5s", color: "#6c5ce7" },
                 { id: 'time_bonus', name: "⏱️ Temps bonus", icon: "⏱️", color: "#fdcb6e" },
                 { id: 'confusion', name: "🌀 Confusion", icon: "🌀", description: "Modifie la question de l'adversaire (même résultat)", color: "#e17055" }
@@ -362,16 +362,17 @@ class Game {
                 UI.showMessage("➕ Tentative supplémentaire !", 'success');
                 break;
 
-            case 'shield':
-                this.shieldActive = true;
-                this.shieldTeam = team;
-                UI.showMessage("🛡️ Bouclier activé !", 'success');
+            case 'rope_freeze':
+                this.ropeFrozen = true;
+                this.ropeFreezedTeam = team;
+                UI.showMessage("❄️ Gel de corde activé ! L'adversaire ne marquera pas au prochain point.", 'success');
                 break;
 
             case 'steal_attempt': // Vol de temps
                 // Programmer le vol de temps pour l'adversaire au début de son prochain tour
                 this.pendingTimeSteals.push({ target: opponent, amount: 5, from: team });
                 UI.showMessage(`⏱️ Vol de temps programmé pour l'adversaire (-5s) !`, 'success');
+                UI.showScheduledEffect(team, 'steal_attempt');
                 break;
 
             case 'time_bonus':
@@ -388,6 +389,7 @@ class Game {
                     // Ne pas remplacer l'opération réelle : stocker l'illusion pour le prochain tour de l'adversaire
                     this.pendingConfusions.push({ target: opponent, ghostOp: newOp, originalOp: { ...advTeam.currentOperation } });
                     UI.showMessage(`🌀 Confusion programmée pour l'adversaire (illusion stockée) !`, 'success');
+                    UI.showScheduledEffect(team, 'confusion');
                 } else {
                     UI.showMessage("Impossible de perturber : l'adversaire n'a pas d'opération active.", 'warning');
                 }
@@ -680,7 +682,7 @@ class Game {
             // Appliquer l'effet si c'est le bon moment
             if (this.currentPowerUp.id === 'double_points' && this.activeTeam === 1) {
                 this.currentPowerUp.applyEffect(this);
-            } else if (this.currentPowerUp.id === 'shield' && this.activeTeam === 1) {
+            } else if (this.currentPowerUp.id === 'rope_freeze' && this.activeTeam === 1) {
                 this.currentPowerUp.applyEffect(this);
             } else if (this.currentPowerUp.id === 'extra_life' && this.activeTeam === 1) {
                 this.currentPowerUp.applyEffect(this);
@@ -829,10 +831,18 @@ class Game {
             // Récompenser avec un bonus (40%)
             this.tryAddBonus(this.activeTeam);
             
-            // Déplacer la corde (avec multiplicateur)
-            const points = this.pointMultiplier || 1;
-            for (let i = 0; i < points; i++) {
-                this.moveRope(this.activeTeam);
+            // Déplacer la corde (avec multiplicateur) SAUF si elle est gelée pour cette équipe
+            if (this.ropeFrozen && this.ropeFreezedTeam !== this.activeTeam) {
+                // L'adversaire a activé le gel contre nous : la corde ne bouge pas
+                UI.showMessage("❄️ La corde est gelée ! Vos points ne comptent pas cette fois.", 'warning');
+                this.ropeFrozen = false;
+                this.ropeFreezedTeam = null;
+            } else {
+                // Corde libre, déplacer normalement
+                const points = this.pointMultiplier || 1;
+                for (let i = 0; i < points; i++) {
+                    this.moveRope(this.activeTeam);
+                }
             }
             this.pointMultiplier = 1; // Reset
             
@@ -858,15 +868,8 @@ class Game {
             UI.playSound('wrong');
             
             // Vérification du bouclier
-            if (this.shieldActive && this.shieldTeam === this.activeTeam) {
-                this.shieldActive = false;
-                UI.showMessage("🛡️ Bouclier vous protège !", 'success');
-                this.waitingForAnswer = false;
-                currentTeam.clearAnswer();
-                UI.clearAnswerDisplay();
-                this.startTimer(false);
-                return;
-            }
+            // Le gel de corde empêche de marquer au prochain point correct (c'est l'équipe active qui l'active)
+            // Il n'est pas annulé ici, il est utilisé dans moveRope si l'équipe adverse l'a activé contre nous
             
             // Vérification de la vie extra
             if (this.extraLife && this.extraLifeTeam === this.activeTeam) {
@@ -1225,8 +1228,10 @@ class Game {
                 if (this.attempts[2] <= 1) score += 40;
                 else score += 5;
             }
-            if (id === 'shield') {
-                if (this.attempts[2] <= 1) score += 30;
+            if (id === 'rope_freeze') {
+                // Utile quand le joueur est sur le point de gagner ou est en bonne position
+                if (Math.abs(this.ropePosition) >= CONFIG.ROPE_STEPS - 3 && this.ropePosition < 0) score += 50; // joueur en danger
+                else score += 25; // sinon, modérément utile
             }
             if (id === 'steal_attempt') {
                 // Useful if opponent has time remaining
@@ -2002,6 +2007,51 @@ class UI {
         }
     }
 
+    // Affiche un petit message localisé lorsqu'un effet est programmé pour l'adversaire
+    static showScheduledEffect(team, effectId) {
+        const container = document.createElement('div');
+        container.className = 'scheduled-effect-toast';
+        const isLeft = team === 1;
+        const icon = effectId === 'confusion' ? '🌀' : '⏱️';
+        const label = effectId === 'confusion' ? 'Illusion programmée' : 'Vol de temps programmé';
+
+        container.innerHTML = `
+            <div style="font-size:1.2rem; margin-right:8px;">${icon}</div>
+            <div style="font-size:0.95rem;">${label}</div>
+        `;
+
+        container.style.cssText = `
+            position: fixed;
+            top: 120px;
+            ${isLeft ? 'left: 10px;' : 'right: 10px;'}
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 14px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 3000;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: all 220ms ease;
+        `;
+
+        document.body.appendChild(container);
+        // animate in
+        requestAnimationFrame(() => {
+            container.style.opacity = '1';
+            container.style.transform = 'translateY(0)';
+        });
+
+        setTimeout(() => {
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(-6px)';
+            setTimeout(() => container.remove(), 220);
+        }, 2200);
+    }
+
     static updatePowerUpIndicators(game) {
         let indicator = document.getElementById('power-up-indicator');
         
@@ -2028,7 +2078,7 @@ class UI {
         const activePowerUps = [];
         if (game.pointMultiplier > 1) activePowerUps.push("💪 Double points");
         if (game.timeFrozen) activePowerUps.push("❄️ Temps gelé");
-        if (game.shieldActive) activePowerUps.push("🛡️ Bouclier");
+        if (game.ropeFrozen) activePowerUps.push("❄️ Gel de corde");
         if (game.extraLife) activePowerUps.push("❤️ Vie extra");
         if (game.opponentTimeReduced) activePowerUps.push("🚀 Turbo actif");
         

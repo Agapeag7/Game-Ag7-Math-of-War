@@ -81,14 +81,14 @@ Aucune installation supplémentaire ni connexion internet n'est requise (les pol
 | Vie extra      | Une erreur est ignorée (une fois). |
 
 ### Bonus d'inventaire (obtenus après une bonne réponse)
-| Bonus            | Effet (utilisable pendant son tour sauf mention) |
-|------------------|--------------------------------------------------|
+| Bonus            | Effet (utilisable pendant son tour) |
+|------------------|-------------------------------------|
 | Double points | Prochaine bonne réponse = 2 points. |
 | Tentative sup | Gagne une tentative supplémentaire. |
-| Bouclier     | Protège contre une erreur. |
-| Vol de temps  | Retire 5 secondes au chrono de l'adversaire. (s'utilise pendant votre tour ; l'effet est appliqué au tour adverse) |
+| Gel de corde      | L'adversaire ne marque pas à son prochain point correct. |
+| Vol de temps  | Retire 5 secondes au chrono de l'adversaire (s'applique à son tour). |
 | Temps bonus   | Ajoute 5 secondes à son propre chrono. |
-| Confusion      | Change la question de l'adversaire (même résultat). (s'utilise pendant votre tour ; l'illusion est affichée au tour adverse) |
+| Confusion      | Affiche une question fantôme à l'adversaire pendant 1s (la vraie question reste valide). |
 
 ### Intelligence Artificielle (mode Joueur vs IA)
 - L'IA répond après un délai dépendant du niveau de difficulté.
