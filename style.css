@@ -1612,6 +1612,17 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         padding: 8px;
     }
 
+    /* Masquer les noms d'équipe dans les panneaux bonus latéraux */
+    .bonus-side::before {
+        display: none;
+    }
+
+    .bonus-side {
+        width: 100px; /* Réduire la largeur */
+        padding: 10px 8px;
+        top: 100px; /* Ajuster la position verticale */
+    }
+
     .bonus-bar {
         max-width: 200px; /* Réduire encore plus sur mobile */
         margin: 8px auto; /* Centrer */
@@ -1908,6 +1919,17 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     .bonus-icon-item {
         justify-content: center;
         padding: 6px;
+    }
+
+    /* Masquer les noms d'équipe dans les panneaux bonus latéraux */
+    .bonus-side::before {
+        display: none;
+    }
+
+    .bonus-side {
+        width: 80px; /* Très étroit */
+        padding: 8px 6px;
+        top: 90px; /* Position plus haute */
     }
 
     .bonus-container {
