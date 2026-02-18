@@ -1378,3 +1378,533 @@ body {
         font-size: 2rem;
     }
 }
+
+/* *********************************
+MEDIA QUERIES POUR MINI TABLETTES ET PHONES
+********************************* */
+@media screen and (max-width: 992px) {
+    .game-container {
+        max-width: 100%;
+        min-height: auto;
+        margin: 10px;
+        padding: 0;
+    }
+
+    .screen {
+        padding: 20px 15px;
+    }
+
+    .home-content {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .difficulty-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .mode-cards {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .game-title {
+        font-size: 2.8rem;
+        text-align: center;
+    }
+
+    .game-subtitle {
+        font-size: 1.1rem;
+        text-align: center;
+    }
+
+    .home-rope-decoration {
+        height: 80px;
+        margin-bottom: 20px;
+    }
+
+    .setting-group label {
+        font-size: 1.1rem;
+    }
+
+    /* Masquer éléments décoratifs non essentiels */
+    .rope-characters {
+        display: none;
+    }
+
+    /* Réduire animations pour performance mobile */
+    .team-indicator {
+        animation: none;
+    }
+}
+
+/* Media queries pour téléphones */
+@media screen and (max-width: 768px) {
+    .game-container {
+        margin: 5px;
+        border-radius: 10px;
+    }
+
+    .screen {
+        padding: 15px 10px;
+    }
+
+    .home-content {
+        padding: 0 5px;
+    }
+
+    .difficulty-cards {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .mode-cards {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .game-title {
+        font-size: 2rem;
+        margin: 10px 0;
+    }
+
+    .game-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+
+    .home-rope-decoration {
+        display: none; /* Masquer décoration sur mobiles */
+    }
+
+    .setting-group {
+        margin-bottom: 20px;
+    }
+
+    .setting-group label {
+        font-size: 1rem;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .difficulty-card, .mode-card {
+        padding: 12px;
+        min-height: auto;
+    }
+
+    .card-icon {
+        font-size: 1.4rem;
+        margin-bottom: 5px;
+    }
+
+    .card-title {
+        font-size: 0.95rem;
+        margin-bottom: 3px;
+    }
+
+    .card-desc {
+        font-size: 0.85rem;
+    }
+
+    /* Zone de jeu */
+    .game-area {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .team-play-area {
+        padding: 15px;
+    }
+
+    .question-display {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+
+    .answer-display {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+    }
+
+    .timer {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+
+    .team-score {
+        font-size: 1.6rem;
+    }
+
+    .round-info {
+        font-size: 1rem;
+    }
+
+    /* Contrôles */
+    .controls-area {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .numeric-pad {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 15px;
+    }
+
+    .num-btn, .action-btn {
+        padding: 12px;
+        font-size: 1rem;
+        min-height: 48px; /* Taille tactile minimale */
+    }
+
+    .validate-btn {
+        grid-column: span 3;
+    }
+
+    .game-actions {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .game-action-btn {
+        padding: 12px;
+        font-size: 0.85rem;
+        min-height: 48px;
+        flex: 1;
+    }
+
+    /* Bonus */
+    .bonus-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .bonus-title {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .team-bonus h4 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    .bonus-list {
+        min-height: 80px;
+    }
+
+    .bonus-item {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    /* Corde */
+    .rope-container {
+        height: 120px;
+        margin: 20px 0;
+    }
+
+    .rope {
+        height: 20px;
+    }
+
+    .rope-center {
+        width: 60px;
+        height: 60px;
+        font-size: 1.4rem;
+    }
+
+    .team-indicators {
+        top: -25px;
+    }
+
+    .team-indicator {
+        width: 50px;
+        height: 50px;
+        font-size: 1.1rem;
+    }
+
+    .rope-characters .left-puller,
+    .rope-characters .right-puller {
+        display: none; /* Masquer personnages sur mobiles */
+    }
+
+    /* Messages */
+    .message {
+        font-size: 0.95rem;
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    /* Écran de victoire */
+    #victory-screen {
+        padding: 20px;
+    }
+
+    #victory-message {
+        font-size: 1.6rem;
+        margin-bottom: 20px;
+    }
+
+    #victory-message i {
+        font-size: 2.3rem;
+    }
+
+    .victory-buttons {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .victory-buttons button {
+        padding: 15px;
+        font-size: 1rem;
+        min-height: 48px;
+    }
+
+    /* Indicateurs d'équipe */
+    .team-indicators {
+        justify-content: space-around;
+    }
+
+    .team-indicator {
+        flex: none;
+        width: 60px;
+        height: 60px;
+    }
+
+    /* Tentatives */
+    .attempts-display {
+        font-size: 0.95rem;
+    }
+
+    .attempts-dot {
+        width: 12px;
+        height: 12px;
+        margin: 0 2px;
+    }
+
+    /* Masquer éléments non essentiels */
+    .question-display i {
+        display: none;
+    }
+
+    .timer i {
+        display: none;
+    }
+}
+
+/* Media queries pour très petits écrans (mobiles) */
+@media screen and (max-width: 480px) {
+    .game-container {
+        margin: 0;
+        border-radius: 0;
+        min-height: 100vh;
+    }
+
+    .screen {
+        padding: 10px 8px;
+    }
+
+    .home-content {
+        padding: 0 3px;
+    }
+
+    .game-title {
+        font-size: 1.6rem;
+        margin: 8px 0;
+    }
+
+    .game-subtitle {
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+
+    .home-rope-decoration {
+        display: none;
+    }
+
+    .difficulty-card, .mode-card {
+        padding: 10px;
+    }
+
+    .card-icon {
+        font-size: 1.2rem;
+        margin-bottom: 3px;
+    }
+
+    .card-title {
+        font-size: 0.85rem;
+        margin-bottom: 2px;
+    }
+
+    .card-desc {
+        font-size: 0.75rem;
+        display: none; /* Masquer descriptions pour économiser espace */
+    }
+
+    /* Zone de jeu */
+    .team-play-area {
+        padding: 12px;
+    }
+
+    .question-display {
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+    }
+
+    .answer-display {
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+    }
+
+    .timer {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+    }
+
+    .team-score {
+        font-size: 1.4rem;
+    }
+
+    .round-info {
+        font-size: 0.9rem;
+    }
+
+    /* Pavé numérique */
+    .numeric-pad {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 12px;
+    }
+
+    .num-btn, .action-btn {
+        padding: 10px;
+        font-size: 0.95rem;
+        min-height: 44px; /* Standard tactile */
+    }
+
+    .game-actions {
+        gap: 6px;
+    }
+
+    .game-action-btn {
+        padding: 10px;
+        font-size: 0.75rem;
+        min-height: 44px;
+    }
+
+    /* Corde */
+    .rope-container {
+        height: 100px;
+        margin: 15px 0;
+    }
+
+    .rope {
+        height: 18px;
+    }
+
+    .rope-center {
+        width: 50px;
+        height: 50px;
+        font-size: 1.1rem;
+    }
+
+    .team-indicator {
+        width: 45px;
+        height: 45px;
+        font-size: 0.9rem;
+    }
+
+    .rope-characters .left-puller,
+    .rope-characters .right-puller {
+        display: none;
+    }
+
+    /* Messages */
+    .message {
+        font-size: 0.85rem;
+        padding: 10px;
+        margin-bottom: 12px;
+    }
+
+    /* Écran de victoire */
+    #victory-message {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+
+    #victory-message i {
+        font-size: 1.8rem;
+    }
+
+    .victory-buttons button {
+        padding: 12px;
+        font-size: 0.95rem;
+        min-height: 44px;
+    }
+
+    /* Bonus */
+    .bonus-title {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+    }
+
+    .team-bonus h4 {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .bonus-item {
+        padding: 6px;
+        font-size: 0.75rem;
+    }
+
+    /* Indicateurs d'équipe */
+    .team-indicators {
+        top: -20px;
+    }
+
+    .team-indicator {
+        width: 50px;
+        height: 50px;
+    }
+
+    /* Tentatives */
+    .attempts-display {
+        font-size: 0.85rem;
+    }
+
+    .attempts-dot {
+        width: 10px;
+        height: 10px;
+        margin: 0 1px;
+    }
+
+    /* Scores */
+    .score-item {
+        padding: 8px;
+        font-size: 1rem;
+    }
+
+    /* Masquer plus d'éléments non essentiels */
+    .round-info {
+        display: none;
+    }
+
+    .bonus-container {
+        display: none; /* Masquer bonus sur très petits écrans pour économiser espace */
+    }
+
+    /* Ajuster layout pour très petits écrans */
+    .game-area {
+        gap: 10px;
+    }
+
+    .controls-area {
+        gap: 10px;
+    }
+}

@@ -1304,6 +1304,10 @@ class UI {
         });
     }
 
+    static isMobile() {
+        return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
     static cacheElements() {
         this.screens = {
             home: document.getElementById('home-screen'),
@@ -1460,6 +1464,11 @@ class UI {
 
     // Dans UI.showMessage(), enlevez la ligne en double :
     static showMessage(text, type = 'info') {
+        // Sur mobile, ne montrer que les messages "Bonne réponse"
+        if (this.isMobile() && !text.includes('Bonne réponse')) {
+            return;
+        }
+        
         if (!this.messageContainer) {
             this.createMessageContainer();
         }
