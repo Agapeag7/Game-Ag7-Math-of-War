@@ -2013,6 +2013,210 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     }
 }
 
+/* ==================== OPTIMISATION MOBILE POUR QUE TOUT TIENNE SANS SCROLL ==================== */
+
+@media screen and (max-width: 768px) {
+    /* Conteneur principal : prend toute la hauteur de l'écran, pas de défilement */
+    .game-container {
+        min-height: 100vh;
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden; /* Empêche le défilement global */
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Chaque écran actif doit remplir le conteneur et permettre le défilement interne si nécessaire */
+    .screen.active {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 10px 8px;
+        overflow-y: auto; /* Permet le défilement interne si le contenu dépasse, mais on va tout compacter */
+    }
+
+    /* Écran d'accueil : on garde le défilement car il peut être long */
+    #home-screen.screen.active {
+        display: block;
+        overflow-y: auto;
+    }
+
+    /* Écran de jeu : on compacte tout */
+    #game-screen.screen.active {
+        padding: 8px 5px;
+    }
+
+    /* En-tête plus compact */
+    .game-header {
+        margin-bottom: 5px;
+        gap: 5px;
+    }
+    .team {
+        padding: 8px 5px;
+    }
+    .team-name {
+        font-size: 1rem;
+        margin-bottom: 2px;
+    }
+    .team-score {
+        font-size: 1.5rem;
+    }
+    .match-info {
+        font-size: 0.9rem;
+    }
+    .timer {
+        font-size: 1.2rem;
+        padding: 2px 8px;
+        margin-top: 2px;
+    }
+    .timer-container {
+        margin-top: 5px;
+        height: 8px;
+    }
+
+    /* Zone de corde réduite */
+    .tug-of-war-area {
+        height: 80px;
+        margin: 5px 0 10px;
+    }
+    .rope-container {
+        margin: 15px 0;
+        height: 20px;
+    }
+    .rope-center {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    .team-indicator {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+    }
+
+    /* Zone de questions plus compacte */
+    .game-area {
+        gap: 8px;
+        margin-bottom: 50px; /* Réserve l'espace pour les bonus */
+    }
+    .team-play-area {
+        padding: 10px;
+    }
+    .question-display {
+        font-size: 1.3rem;
+        padding: 10px;
+    }
+
+    /* Panneaux de bonus ultra-compacts, en bas, de chaque côté */
+    .bonus-side {
+        position: fixed;
+        top: auto;
+        bottom: 70px; /* Juste au-dessus du pavé numérique */
+        width: 30%;
+        max-width: 100px;
+        padding: 4px 2px;
+        background: rgba(0, 0, 0, 0.85);
+        border-radius: 15px;
+        z-index: 1500;
+    }
+    .bonus-side.left {
+        left: 2px;
+        right: auto;
+    }
+    .bonus-side.right {
+        right: 2px;
+        left: auto;
+    }
+    .bonus-side::before {
+        content: none; /* Pas de texte */
+    }
+    .bonus-side .bonus-icon-item {
+        padding: 3px 4px;
+        gap: 2px;
+        border-radius: 20px;
+    }
+    .bonus-side .bonus-emoji {
+        font-size: 1rem;
+    }
+    .bonus-side .bonus-counter {
+        font-size: 0.7rem;
+        min-width: 16px;
+        height: 16px;
+        border-radius: 8px;
+    }
+
+    /* Barre de tentatives plus petite */
+    .attempts-compact {
+        padding: 3px 12px;
+        font-size: 0.9rem;
+        gap: 10px;
+    }
+    .attempts-team1 span, .attempts-team2 span {
+        padding: 2px 8px;
+        min-width: 25px;
+    }
+
+    /* Pavé numérique réduit mais toujours tactile */
+    .controls-area {
+        gap: 5px;
+    }
+    .numeric-pad {
+        gap: 4px;
+        padding: 5px;
+    }
+    .num-btn, .action-btn {
+        padding: 8px 0;
+        font-size: 1rem;
+        min-height: 40px;
+    }
+    .game-actions {
+        gap: 4px;
+    }
+    .game-action-btn {
+        padding: 8px 4px;
+        font-size: 0.7rem;
+        min-height: 40px;
+    }
+
+    /* Ajustement du bouton Valider */
+    #validate-btn-main {
+        font-size: 0.9rem;
+    }
+}
+
+/* Pour les très petits écrans (moins de 480px) */
+@media screen and (max-width: 480px) {
+    .bonus-side {
+        bottom: 65px;
+        width: 28%;
+        max-width: 85px;
+    }
+    .bonus-side .bonus-emoji {
+        font-size: 0.9rem;
+    }
+    .bonus-side .bonus-counter {
+        font-size: 0.65rem;
+        min-width: 14px;
+        height: 14px;
+    }
+    .game-area {
+        margin-bottom: 55px;
+    }
+    .question-display {
+        font-size: 1.1rem;
+    }
+    .team-score {
+        font-size: 1.3rem;
+    }
+    .timer {
+        font-size: 1rem;
+    }
+    .num-btn, .action-btn {
+        font-size: 0.9rem;
+        min-height: 38px;
+    }
+}
+
 /* ==================== AMÉLIORATIONS MOBILE POUR BONUS ET LAYOUT ==================== */
 
 /* Réduction de la taille des panneaux de bonus sur tablettes */
