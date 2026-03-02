@@ -2493,6 +2493,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+    display: none !important;
     transition: opacity 200ms ease, visibility 200ms ease;
 }
 

@@ -2250,6 +2250,15 @@ class UI {
 
     static renderBonusIconsForTeam(container, inventory, team) {
         if (!container) return;
+        // do not show bonuses when game is not active or paused
+        if ((game && game.isPaused) || (UI.screens && UI.screens.game && !UI.screens.game.classList.contains('active'))) {
+            const parentPanel = container.closest('.bonus-side');
+            if (parentPanel) {
+                parentPanel.classList.remove('visible','expanded');
+                parentPanel.style.display = 'none';
+            }
+            return;
+        }
         const activeBonuses = Object.entries(inventory).filter(([_, bonus]) => bonus.count > 0);
         
         if (activeBonuses.length === 0) {
