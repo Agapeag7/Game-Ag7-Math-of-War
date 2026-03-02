@@ -2406,12 +2406,7 @@ class UI {
             .bonus-side.right { right: 10px; }
 
             .bonus-side::before {
-                content: attr(data-team);
-                display: block;
-                text-align: center;
-                font-weight: bold;
-                font-size: 1.2rem;
-                margin-bottom: 10px;
+                content: none; /* Supprime le nom de l'équipe */
             }
 
             .bonus-side .bonus-icons {
