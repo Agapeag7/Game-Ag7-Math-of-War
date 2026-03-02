@@ -2360,3 +2360,65 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         padding: 20px 15px;
     }
 }
+
+/* Overrides to ensure bonus side panels stay compact and adapt to content */
+.bonus-side {
+    width: auto !important;          /* let content dictate width */
+    min-width: 48px !important;     /* minimal visible size */
+    max-width: 160px !important;    /* avoid overly large panels */
+    max-height: 180px !important;   /* prevent full-height panels */
+    overflow: hidden !important;    /* hide overflow until items appear */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 6px !important;
+    box-sizing: border-box !important;
+}
+
+.bonus-side .bonus-icons {
+    display: flex !important;
+    flex-direction: row !important;   /* show icons in a row by default */
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+}
+
+.bonus-side .bonus-icon-item {
+    padding: 6px 6px !important;
+    min-width: auto !important;
+    border-radius: 14px !important;
+}
+
+/* When there are many bonuses, allow internal scrolling but keep panel compact */
+.bonus-side.expanded {
+    max-height: 50vh !important;
+    overflow-y: auto !important;
+}
+
+/* Ensure the no-bonus state stays small */
+.bonus-side .no-bonus-message {
+    display: block !important;
+    padding: 6px !important;
+    opacity: 0.6;
+}
+
+/* Mobile-specific tighter limits */
+@media screen and (max-width: 768px) {
+    .bonus-side {
+        max-width: 110px !important;
+        max-height: 120px !important;
+        padding: 4px !important;
+    }
+    .bonus-side .bonus-icons {
+        gap: 4px !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .bonus-side {
+        max-width: 90px !important;
+        max-height: 110px !important;
+    }
+}

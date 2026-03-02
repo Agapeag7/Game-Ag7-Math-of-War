@@ -2235,6 +2235,8 @@ class UI {
         
         if (activeBonuses.length === 0) {
             container.innerHTML = '<span class="no-bonus-message"><i class="fas fa-gift"></i></span>';
+            const parentEmpty = container.closest('.bonus-side');
+            if (parentEmpty) parentEmpty.classList.remove('expanded');
             return;
         }
         
@@ -2244,6 +2246,12 @@ class UI {
                 <span class="bonus-counter" style="background: ${bonus.color};">${bonus.count}</span>
             </div>
         `).join('');
+        // If too many icons, mark the side panel as expanded to allow internal scrolling
+        const parentPanel = container.closest('.bonus-side');
+        if (parentPanel) {
+            if (activeBonuses.length > 3) parentPanel.classList.add('expanded');
+            else parentPanel.classList.remove('expanded');
+        }
         
         container.querySelectorAll('.bonus-icon-item').forEach(item => {
             item.addEventListener('click', (e) => {
