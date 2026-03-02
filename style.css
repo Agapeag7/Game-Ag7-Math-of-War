@@ -1450,15 +1450,17 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         padding: 0 5px;
     }
 
-    .difficulty-cards {
-        grid-template-columns: 1fr;
+    /* difficulties and modes will use flex horiz scroll; override later */
+    .difficulty-cards, .mode-cards {
+        display: flex !important;
+        flex-wrap: nowrap;
+        overflow-x: auto;
         gap: 10px;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
     }
-
-    .mode-cards {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
+    .difficulty-card { flex: 0 0 120px; padding:15px; margin-bottom:0; }
+    .mode-card { flex: 0 0 140px; padding:20px; margin-bottom:0; }
 
     .game-title {
         font-size: 2rem;
@@ -2021,9 +2023,38 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         min-height: 100vh;
         height: 100vh;
         max-height: 100vh;
-        overflow: hidden; /* Empêche le défilement global */
+        overflow: auto; /* Allow internal scrolling if content exceeds viewport */
         display: flex;
         flex-direction: column;
+    }
+    
+    /* Difficulty cards horizontal scrolling on mobile to avoid vertical page resize */
+    .difficulty-cards {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 5px; /* give some breathing room for scroll */
+        -webkit-overflow-scrolling: touch;
+    }
+    .difficulty-card {
+        flex: 0 0 120px;
+        padding: 15px;
+        margin-bottom: 0;
+    }
+    /* also make mode cards horizontal */
+    .mode-cards {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .mode-card {
+        flex: 0 0 140px;
+        padding: 20px;
+        margin-bottom: 0;
     }
 
     /* Chaque écran actif doit remplir le conteneur et permettre le défilement interne si nécessaire */
@@ -2035,10 +2066,20 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         overflow-y: auto; /* Permet le défilement interne si le contenu dépasse, mais on va tout compacter */
     }
 
-    /* Écran d'accueil : on garde le défilement car il peut être long */
+    /* Allow page-level scrolling if needed; prefer internal container scrolling */
+    html, body {
+        height: 100%;
+    }
+
+    /* Écran d'accueil : allow local scrolling if content exceeds, keep centered */
     #home-screen.screen.active {
-        display: block;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 10px 8px;
+        overflow-y: auto; /* allow local scrolling if home content exceeds */
+        justify-content: center;
+        align-items: center;
     }
 
     /* Écran de jeu : on compacte tout */
@@ -2368,12 +2409,12 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     max-width: 160px !important;    /* avoid overly large panels */
     max-height: 180px !important;   /* prevent full-height panels */
     overflow: hidden !important;    /* hide overflow until items appear */
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
     padding: 6px !important;
     box-sizing: border-box !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 200ms ease, visibility 200ms ease;
 }
 
 .bonus-side .bonus-icons {
@@ -2395,6 +2436,17 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 .bonus-side.expanded {
     max-height: 50vh !important;
     overflow-y: auto !important;
+}
+
+/* Visible state: shown only when JS adds .visible */
+.bonus-side.visible {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
 }
 
 /* Ensure the no-bonus state stays small */
