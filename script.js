@@ -1496,11 +1496,11 @@ class UI {
         message.style.cssText = `
             background: ${bgColor};
             color: white;
-            padding: 15px 30px;
+            padding: 10px 20px;
             border-radius: 50px;
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             animation: slideDown 0.3s ease;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             pointer-events: none;

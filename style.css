@@ -2088,6 +2088,28 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         max-height: 90px !important;
     }
 
+    /* Pause screen compact on mobile */
+    #pause-screen {
+        padding: 0 !important;
+    }
+    
+    #pause-screen h2 {
+        font-size: 1.8rem !important;
+        margin-bottom: 20px !important;
+        padding-top: 40px !important;
+    }
+    
+    #pause-screen .start-btn {
+        padding: 12px 20px !important;
+        font-size: 1rem !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Message container positioned higher on mobile */
+    #message-container {
+        top: 10px !important;
+    }
+
     }
 
     /* Écran d'accueil : allow local scrolling if content exceeds, keep centered */
