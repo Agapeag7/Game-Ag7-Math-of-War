@@ -2427,12 +2427,14 @@ class UI {
 
             .bonus-side .bonus-icons {
                 display: flex;
-                /* lay out icons horizontally and wrap when needed
-                   so panel grows in width instead of height */
+                /* single row of icons with horizontal scrolling if needed */
                 flex-direction: row;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
                 gap: 8px;
-                justify-content: center;
+                justify-content: flex-start;
+                overflow-x: auto;
+                overflow-x: auto;
+                WebkitOverflowScrolling: touch;
             }
 
             .bonus-side .bonus-icon-item {

@@ -1169,7 +1169,7 @@ body {
 
 .question-display {
     text-align: center;
-    font-size: 2.5rem;
+    font-size: 2.8rem; /* larger for better readability */
     font-weight: bold;
     padding: 20px;
     background: white;
@@ -1722,7 +1722,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
     /* Tentatives */
     .attempts-display {
-        font-size: 0.95rem;
+        font-size: 0.8rem; /* reduced globally, attempts info is not critical */
     }
 
     .attempts-dot {
@@ -1796,7 +1796,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     }
 
     .question-display {
-        font-size: 1.2rem;
+        font-size: 1.4rem; /* larger question text on tiny screens */
         margin-bottom: 12px;
     }
 
@@ -1983,12 +1983,12 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
     /* Tentatives */
     .attempts-display {
-        font-size: 0.85rem;
+        font-size: 0.6rem; /* make tiny, not important info */
     }
 
     .attempts-dot {
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
         margin: 0 1px;
     }
 
@@ -2114,12 +2114,15 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         margin-bottom: 8px !important;
     }
 
-    /* Message container positioned higher on mobile and slimmed down */
+    /* Message container positioned lower and centered on mobile */
     #message-container {
-        top: 5px !important;
-        left: 5px !important;
-        right: 5px !important;
+        top: auto !important;
+        bottom: 10px !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
         max-width: 90vw !important;
+        padding: 0 5px !important;
     }
 
     }
@@ -2202,7 +2205,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         padding: 10px;
     }
     .question-display {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
         padding: 10px;
     }
 
@@ -2302,7 +2305,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         margin-bottom: 55px;
     }
     .question-display {
-        font-size: 1.1rem;
+        font-size: 1.5rem;
     }
     .team-score {
         font-size: 1.3rem;
@@ -2434,9 +2437,13 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         height: 20px;
     }
 
-    /* Réduction de la marge pour le game-area */
+    /* Réduction de la marge pour le game-area, rapprocher calculatrice des questions */
     .game-area {
-        margin-bottom: 50px;
+        margin-bottom: 30px;
+    }
+    .controls-area {
+        margin-top: 5px;   /* bring pad closer */
+        margin-bottom: 60px; /* add breathing room below pad */
     }
 
     /* Police des questions plus petite */
@@ -2464,7 +2471,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 .bonus-side {
     width: auto !important;          /* let content dictate width */
     min-width: 48px !important;      /* minimal visible size */
-    max-width: 80vw !important;      /* expand to most of screen if needed */
+    max-width: 95vw !important;      /* expand to most of screen if needed */
     max-height: 60vh !important;     /* never occupy entire height */
     overflow: hidden !important;     /* hide overflow until items appear */
     padding: 6px !important;
@@ -2477,11 +2484,13 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
 .bonus-side .bonus-icons {
     display: flex !important;
-    flex-direction: row !important;   /* show icons in a row by default */
-    flex-wrap: wrap !important;       /* allow multiple rows instead of stretching height */
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;     /* keep icons in one line */
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     gap: 6px !important;
+    overflow-x: auto !important;      /* scroll sideways if too many icons */
+    -webkit-overflow-scrolling: touch !important;
 }
 
 .bonus-side .bonus-icon-item {
@@ -2492,8 +2501,8 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
 /* When there are many bonuses, allow internal scrolling but keep panel compact */
 .bonus-side.expanded {
-    /* no forced max-height; size should wrap content */
     overflow-y: auto !important;
+    overflow-x: auto !important;
 }
 
 
