@@ -1548,8 +1548,24 @@ class UI {
 
         // Afficher ou cacher les panneaux de bonus selon l'écran
         const isGameScreen = (screenName === 'game');
-        if (this.bonusLeft) this.bonusLeft.style.display = isGameScreen ? 'flex' : 'none';
-        if (this.bonusRight) this.bonusRight.style.display = isGameScreen ? 'flex' : 'none';
+        if (this.bonusLeft) {
+            if (isGameScreen) {
+                // only actually display if JS previously marked it visible
+                this.bonusLeft.style.display = this.bonusLeft.classList.contains('visible') ? 'flex' : 'none';
+            } else {
+                // hide and clear any visible/expanded state while not on game screen
+                this.bonusLeft.style.display = 'none';
+                this.bonusLeft.classList.remove('visible', 'expanded');
+            }
+        }
+        if (this.bonusRight) {
+            if (isGameScreen) {
+                this.bonusRight.style.display = this.bonusRight.classList.contains('visible') ? 'flex' : 'none';
+            } else {
+                this.bonusRight.style.display = 'none';
+                this.bonusRight.classList.remove('visible', 'expanded');
+            }
+        }
         // Ne rien faire pour attemptsContainer – il est dans l'écran de jeu
     }
 

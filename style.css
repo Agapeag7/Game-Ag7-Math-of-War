@@ -95,7 +95,7 @@ body {
     }
     
     .question-display {
-        font-size: 1.8rem;
+        font-size: 2rem; /* a bit larger on tablets/phones */
     }
 }
 
@@ -1799,7 +1799,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     }
 
     .question-display {
-        font-size: 1.4rem; /* larger question text on tiny screens */
+        font-size: 1.8rem; /* larger question text on tiny screens */
         margin-bottom: 12px;
     }
 
@@ -2197,17 +2197,19 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         font-size: 1.2rem;
     }
 
-    /* Zone de questions plus compacte */
+    /* Zone de questions – agrandie pour plus de lisibilité */
     .game-area {
         gap: 8px;
         margin-bottom: 50px; /* Réserve l'espace pour les bonus */
+        padding: 30px 0;
+        min-height: 240px;
     }
     .team-play-area {
-        padding: 10px;
+        padding: 20px;
     }
     .question-display {
-        font-size: 1.5rem;
-        padding: 10px;
+        font-size: 1.8rem;
+        padding: 15px;
     }
 
     /* Panneaux de bonus ultra-compacts, en bas, de chaque côté */
@@ -2250,13 +2252,13 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
     /* Barre de tentatives plus petite */
     .attempts-compact {
-        padding: 3px 12px;
-        font-size: 0.9rem;
-        gap: 10px;
+            padding: 2px 8px;
+            font-size: 0.6rem; /* much smaller: attempts are not crucial */
+            gap: 8px;
     }
     .attempts-team1 span, .attempts-team2 span {
-        padding: 2px 8px;
-        min-width: 25px;
+            padding: 1px 6px;
+            min-width: 18px;
     }
 
     /* Pavé numérique réduit mais toujours tactile */
@@ -2306,11 +2308,22 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         margin-bottom: 55px;
     }
     .question-display {
-        font-size: 1.5rem;
+        font-size: 1.8rem; /* bump for mid-size screen rule */
     }
     .team-score {
         font-size: 1.3rem;
     }
+
+/* Specific targeting for the HTML attempts spans */
+.attempts-compact #attempts-1,
+.attempts-compact #attempts-2 {
+    font-size: 0.6rem !important;
+    line-height: 1;
+    display: inline-block;
+    min-width: 18px;
+    text-align: center;
+    padding: 0 4px;
+}
     .timer {
         font-size: 1rem;
     }
