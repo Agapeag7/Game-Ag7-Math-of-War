@@ -1448,6 +1448,8 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
     .home-content {
         padding: 0 5px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
     }
 
     /* difficulties and modes will use flex horiz scroll; override later */
@@ -1463,13 +1465,13 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     .mode-card { flex: 0 0 140px; padding:20px; margin-bottom:0; }
 
     .game-title {
-        font-size: 2rem;
-        margin: 10px 0;
+        font-size: 1.8rem;
+        margin: 8px 0;
     }
 
     .game-subtitle {
-        font-size: 0.95rem;
-        margin-bottom: 20px;
+        font-size: 0.85rem;
+        margin-bottom: 16px;
     }
 
     .home-rope-decoration {
@@ -2022,10 +2024,11 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     .game-container {
         min-height: 100vh;
         height: 100vh;
-        max-height: 100vh;
+        max-height: calc(100vh - 60px); /* leave more breathing room top/bottom */
         overflow: auto; /* Allow internal scrolling if content exceeds viewport */
         display: flex;
         flex-direction: column;
+        margin: 20px 5px;
     }
     
     /* Difficulty cards horizontal scrolling on mobile to avoid vertical page resize */
@@ -2062,13 +2065,29 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         display: flex;
         flex-direction: column;
         height: 100%;
-        padding: 10px 8px;
+        padding: 8px 6px;
         overflow-y: auto; /* Permet le défilement interne si le contenu dépasse, mais on va tout compacter */
     }
 
     /* Allow page-level scrolling if needed; prefer internal container scrolling */
     html, body {
         height: 100%;
+        font-size: 14px;
+    }
+
+    /* font reductions inside container */
+    .game-header .team-name { font-size: 1.2rem; }
+    .game-header .team-score { font-size: 1.6rem; }
+    .match-info, .timer { font-size: 1rem; }
+    .settings-panel, .setting-group label, .card-title, .card-desc { font-size: 0.9rem; }
+    .home-footer p, .home-stats { font-size: 0.8rem; }
+
+    /* tighter bonus panels on mobile */
+    .bonus-side {
+        max-width: 60px !important;
+        max-height: 90px !important;
+    }
+
     }
 
     /* Écran d'accueil : allow local scrolling if content exceeds, keep centered */

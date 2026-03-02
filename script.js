@@ -2253,7 +2253,8 @@ class UI {
         const parentPanel = container.closest('.bonus-side');
         if (parentPanel) {
             parentPanel.classList.add('visible');
-            if (activeBonuses.length > 3) parentPanel.classList.add('expanded');
+            // small screens get expansion sooner
+            if (activeBonuses.length > 2) parentPanel.classList.add('expanded');
             else parentPanel.classList.remove('expanded');
         }
         
