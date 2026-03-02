@@ -11,12 +11,11 @@
   - *Joueur vs Joueur* : deux joueurs s'affrontent sur le même appareil.
   - *Joueur vs IA* : affrontez une intelligence artificielle dont la difficulté s'adapte au niveau choisi.
 - **6 niveaux de difficulté** : du niveau débutant (additions simples) au niveau expert (opérations mélangées et mode chronométré).
-- **Système de tentatives** : chaque équipe dispose de 3 tentatives pour répondre correctement. En cas d'échec, la corde se déplace vers l'adversaire.
+- **Système de tentatives** : chaque équipe dispose de 2 tentatives pour répondre correctement. En cas d'échec, la corde se déplace vers l'adversaire.
 - **Power‑ups aléatoires** : des bonus spéciaux peuvent apparaître en début de manche (double points, gel du temps, bouclier, réponse auto, turbo, vie extra).
-- **Bonus d'inventaire** : après chaque bonne réponse, vous pouvez obtenir un bonus utilisable plus tard (double points, tentative supplémentaire, bouclier, vol de temps, temps bonus, confusion).
+- **Bonus d'inventaire** : après chaque bonne réponse, vous pouvez obtenir un bonus utilisable plus tard (double points, tentative supplémentaire, question fantôme, vol de temps adverse, temps bonus).
 - **Corde dynamique** : la position de la corde évolue en temps réel avec des effets de tension et des indicateurs d'équipe.
 - **Interface utilisateur riche** : icônes, animations, messages contextuels, confettis de victoire, barre de progression du temps.
-- **Sauvegarde des meilleurs scores** dans le navigateur (localStorage).
 
 ---
 
@@ -34,8 +33,8 @@
 ### Utilisation des bonus
 
 - Les bonus collectés apparaissent dans des **panneaux latéraux** (gauche pour l'équipe rouge, droite pour l'équipe bleue).
-- Cliquez sur un bonus pour l'activer **pendant votre tour** (sauf pour "Confusion" et "Vol de temps" qui ne peuvent être utilisés que pendant le tour adverse).
-- Certains bonus ont un effet immédiat (double points, tentative supplémentaire), d'autres durent plusieurs secondes (gel du temps, turbo).
+- Cliquez sur un bonus pour l'activer **pendant votre tour**.
+- Certains bonus ont un effet immédiat (double points, tentative supplémentaire), d'autres durent plusieurs secondes (Confusion, vol du temps).
 
 ---
 
@@ -86,7 +85,7 @@ Aucune installation supplémentaire ni connexion internet n'est requise (les pol
 | Double points | Prochaine bonne réponse = 2 points. |
 | Tentative sup | Gagne une tentative supplémentaire. |
 | Gel de corde      | L'adversaire ne marque pas à son prochain point correct. |
-| Vol de temps  | Retire 5 secondes au chrono de l'adversaire (s'applique à son tour). |
+| Vol de temps  | Retire 75% des secondes au chrono de l'adversaire (s'applique à son tour). |
 | Temps bonus   | Ajoute 5 secondes à son propre chrono. |
 | Confusion      | Affiche une question fantôme à l'adversaire pendant 1s (la vraie question reste valide). |
 

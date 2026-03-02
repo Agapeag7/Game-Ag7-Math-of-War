@@ -2012,3 +2012,147 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         gap: 10px;
     }
 }
+
+/* ==================== AMÉLIORATIONS MOBILE POUR BONUS ET LAYOUT ==================== */
+
+/* Réduction de la taille des panneaux de bonus sur tablettes */
+@media screen and (max-width: 992px) {
+    .bonus-side {
+        width: 130px;
+        padding: 10px 5px;
+        top: 100px;
+    }
+    .bonus-side .bonus-icon-item {
+        padding: 4px 8px;
+        font-size: 0.9rem;
+    }
+    .bonus-side .bonus-emoji {
+        font-size: 1.4rem;
+    }
+}
+
+/* Réorganisation complète pour mobiles (≤ 768px) */
+@media screen and (max-width: 768px) {
+    /* Panneaux de bonus : passer en bas de l'écran, côte à côte */
+    .bonus-side {
+        position: fixed;
+        top: auto;
+        bottom: 100px; /* Au-dessus du pavé numérique */
+        width: 45%;
+        max-width: 200px;
+        padding: 8px 5px;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 20px;
+        z-index: 1500;
+    }
+    .bonus-side.left {
+        left: 5px;
+        right: auto;
+    }
+    .bonus-side.right {
+        right: 5px;
+        left: auto;
+    }
+    .bonus-side::before {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    .bonus-side .bonus-icon-item {
+        padding: 5px 8px;
+        gap: 4px;
+    }
+    .bonus-side .bonus-emoji {
+        font-size: 1.3rem;
+    }
+    .bonus-side .bonus-counter {
+        font-size: 0.9rem;
+        min-width: 22px;
+        height: 22px;
+    }
+
+    /* Ajustement de la zone de jeu pour laisser de la place aux bonus */
+    .game-area {
+        margin-bottom: 60px; /* Éviter que les questions soient cachées */
+    }
+
+    /* Réduction supplémentaire des en-têtes */
+    .team-name {
+        font-size: 1.2rem;
+    }
+    .team-score {
+        font-size: 2rem;
+    }
+    .match-info {
+        font-size: 1rem;
+    }
+    .timer {
+        font-size: 1.5rem;
+        padding: 3px 10px;
+    }
+
+    /* Pavé numérique plus compact mais toujours tactile */
+    .numeric-pad {
+        gap: 5px;
+        padding: 10px;
+    }
+    .num-btn, .action-btn {
+        padding: 12px 5px;
+        font-size: 1.1rem;
+        min-height: 50px;
+    }
+
+    /* Barre de tentatives mieux intégrée */
+    .attempts-compact {
+        padding: 4px 15px;
+        font-size: 1rem;
+    }
+}
+
+/* Très petits écrans (≤ 480px) */
+@media screen and (max-width: 480px) {
+    /* Bonus encore plus compacts, empilés verticalement si nécessaire */
+    .bonus-side {
+        bottom: 90px;
+        width: 48%;
+        padding: 5px 3px;
+    }
+    .bonus-side::before {
+        font-size: 0.9rem;
+    }
+    .bonus-side .bonus-icon-item {
+        padding: 4px 5px;
+    }
+    .bonus-side .bonus-emoji {
+        font-size: 1.1rem;
+    }
+    .bonus-side .bonus-counter {
+        font-size: 0.8rem;
+        min-width: 20px;
+        height: 20px;
+    }
+
+    /* Réduction de la marge pour le game-area */
+    .game-area {
+        margin-bottom: 50px;
+    }
+
+    /* Police des questions plus petite */
+    .question-display {
+        font-size: 1.2rem;
+        padding: 10px;
+    }
+
+    /* Boutons d'action plus compacts */
+    .game-action-btn {
+        padding: 8px 5px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Ajustement pour les très grands écrans (optionnel) */
+@media screen and (min-width: 1400px) {
+    .bonus-side {
+        width: 200px;
+        padding: 20px 15px;
+    }
+}
