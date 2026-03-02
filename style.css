@@ -2024,11 +2024,11 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     .game-container {
         min-height: 100vh;
         height: 100vh;
-        max-height: calc(100vh - 60px); /* leave more breathing room top/bottom */
+        max-height: calc(100vh - 80px); /* more breathing room top/bottom */
         overflow: auto; /* Allow internal scrolling if content exceeds viewport */
         display: flex;
         flex-direction: column;
-        margin: 20px 5px;
+        margin: 40px 10px;
     }
     
     /* Difficulty cards horizontal scrolling on mobile to avoid vertical page resize */
@@ -2121,6 +2121,11 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         overflow-y: auto; /* allow local scrolling if home content exceeds */
         justify-content: center;
         align-items: center;
+    }
+    /* smaller start button on mobile */
+    .start-btn {
+        padding: 12px !important;
+        font-size: 1.2rem !important;
     }
 
     /* Écran de jeu : on compacte tout */
