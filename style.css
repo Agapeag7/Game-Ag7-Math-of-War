@@ -360,10 +360,16 @@ body {
 
 .mode-card .card-title {
     font-weight: bold;
+    /* same size as difficulty titles */
     font-size: 1.2rem;
     margin-bottom: 5px;
     color: var(--text-dark);
 }
+
+/* ensure difficulty titles also match explicitly */
+.difficulty-card .card-title {
+    font-size: 1.2rem;
+} 
 
 .mode-card .card-desc {
     color: #666;
@@ -2500,12 +2506,20 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 .bonus-side .bonus-icons {
     display: flex !important;
     flex-direction: row !important;
-    flex-wrap: nowrap !important;     /* keep icons in one line */
+    flex-wrap: wrap !important;       /* allow line breaks so all icons visible */
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 6px !important;
-    overflow-x: auto !important;      /* scroll sideways if too many icons */
-    -webkit-overflow-scrolling: touch !important;
+    gap: 4px !important;
+}
+
+/* make emoji and counters very small */
+.bonus-side .bonus-emoji {
+    font-size: 1.2rem !important;
+}
+.bonus-side .bonus-counter {
+    font-size: 0.5rem !important;
+    min-width: 12px !important;
+    height: 12px !important;
 }
 
 .bonus-side .bonus-icon-item {

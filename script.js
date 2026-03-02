@@ -2035,6 +2035,8 @@ class UI {
     static showPowerUp(powerUp) {
         const powerUpDiv = document.createElement('div');
         powerUpDiv.className = 'power-up-notification';
+        // adjust sizes for mobile-friendly power-up popups
+        const isMobile = UI.isMobile();
         powerUpDiv.style.cssText = `
             position: fixed;
             top: 50%;
@@ -2042,9 +2044,9 @@ class UI {
             transform: translate(-50%, -50%);
             background: ${powerUp.color};
             color: white;
-            padding: 40px;
+            padding: ${isMobile ? '20px' : '40px'};
             border-radius: 30px;
-            font-size: 2.5rem;
+            font-size: ${isMobile ? '1.8rem' : '2.5rem'};
             text-align: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             z-index: 3000;
@@ -2053,10 +2055,14 @@ class UI {
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         `;
         
+        // scale down inner elements on mobile
+        const iconSize = isMobile ? '4rem' : '6rem';
+        const nameSize = isMobile ? '1.4rem' : '2rem';
+        const descSize = isMobile ? '0.9rem' : '1.2rem';
         powerUpDiv.innerHTML = `
-            <div style="font-size: 6rem; margin-bottom: 20px; animation: spin 2s infinite;">${powerUp.icon}</div>
-            <div style="font-weight: bold; font-size: 2rem; margin-bottom: 15px;">${powerUp.name}</div>
-            <div style="font-size: 1.2rem; opacity: 0.9; max-width: 300px;">${powerUp.description}</div>
+            <div style="font-size: ${iconSize}; margin-bottom: 20px; animation: spin 2s infinite;">${powerUp.icon}</div>
+            <div style="font-weight: bold; font-size: ${nameSize}; margin-bottom: 15px;">${powerUp.name}</div>
+            <div style="font-size: ${descSize}; opacity: 0.9; max-width: 300px;">${powerUp.description}</div>
         `;
         
         document.body.appendChild(powerUpDiv);
@@ -2452,12 +2458,11 @@ class UI {
 
             .bonus-side .bonus-icons {
                 display: flex;
-                /* single row of icons with horizontal scrolling if needed */
+                /* wrap to show all icons; we shrank them via CSS */
                 flex-direction: row;
-                flex-wrap: nowrap;
-                gap: 8px;
+                flex-wrap: wrap;
+                gap: 6px;
                 justify-content: flex-start;
-                overflow-x: auto;
                 overflow-x: auto;
                 WebkitOverflowScrolling: touch;
             }
