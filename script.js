@@ -1493,14 +1493,17 @@ class UI {
         
         message.innerHTML = icon + text;
         
+        // adjust sizing for mobile to keep notifications unobtrusive
+        const msgFont = this.isMobile() ? '0.75rem' : '0.9rem';
+        const msgPad = this.isMobile() ? '6px 12px' : '10px 20px';
         message.style.cssText = `
             background: ${bgColor};
             color: white;
-            padding: 10px 20px;
+            padding: ${msgPad};
             border-radius: 50px;
-            font-size: 0.9rem;
+            font-size: ${msgFont};
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             animation: slideDown 0.3s ease;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             pointer-events: none;
@@ -2253,8 +2256,8 @@ class UI {
         const parentPanel = container.closest('.bonus-side');
         if (parentPanel) {
             parentPanel.classList.add('visible');
-            // small screens get expansion sooner
-            if (activeBonuses.length > 2) parentPanel.classList.add('expanded');
+            // small screens get expansion only when there are four or more bonuses
+            if (activeBonuses.length > 3) parentPanel.classList.add('expanded');
             else parentPanel.classList.remove('expanded');
         }
         
@@ -2424,8 +2427,12 @@ class UI {
 
             .bonus-side .bonus-icons {
                 display: flex;
-                flex-direction: column;
+                /* lay out icons horizontally and wrap when needed
+                   so panel grows in width instead of height */
+                flex-direction: row;
+                flex-wrap: wrap;
                 gap: 8px;
+                justify-content: center;
             }
 
             .bonus-side .bonus-icon-item {

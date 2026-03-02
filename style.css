@@ -1870,9 +1870,9 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
     /* Messages */
     .message {
-        font-size: 0.85rem;
-        padding: 10px;
-        margin-bottom: 12px;
+        font-size: 0.75rem;
+        padding: 8px;
+        margin-bottom: 10px;
     }
 
     /* Écran de victoire */
@@ -2021,10 +2021,19 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
 @media screen and (max-width: 768px) {
     /* Conteneur principal : prend toute la hauteur de l'écran, pas de défilement */
+    /* extra top/bottom breathing room on home screen */
+    #home-screen { padding-top: 60px; padding-bottom: 60px; }
+    .home-content { padding: 0 5px; }
+    /* shrink title and icons on home page further */
+    #home-screen .game-title { font-size: 1.4rem; }
+    #home-screen .card-icon { font-size: 1rem; }
+    #home-screen .home-rope-decoration { height: 50px; }
+
+
     .game-container {
         min-height: 100vh;
         height: 100vh;
-        max-height: calc(100vh - 80px); /* more breathing room top/bottom */
+        max-height: calc(100vh - 120px); /* more breathing room top/bottom */
         overflow: auto; /* Allow internal scrolling if content exceeds viewport */
         display: flex;
         flex-direction: column;
@@ -2094,20 +2103,23 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     }
     
     #pause-screen h2 {
-        font-size: 1.8rem !important;
-        margin-bottom: 20px !important;
-        padding-top: 40px !important;
+        font-size: 1.6rem !important;
+        margin-bottom: 15px !important;
+        padding-top: 30px !important;
     }
     
     #pause-screen .start-btn {
-        padding: 12px 20px !important;
-        font-size: 1rem !important;
-        margin-bottom: 10px !important;
+        padding: 10px 18px !important;
+        font-size: 0.9rem !important;
+        margin-bottom: 8px !important;
     }
 
-    /* Message container positioned higher on mobile */
+    /* Message container positioned higher on mobile and slimmed down */
     #message-container {
-        top: 10px !important;
+        top: 5px !important;
+        left: 5px !important;
+        right: 5px !important;
+        max-width: 90vw !important;
     }
 
     }
@@ -2451,10 +2463,10 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 /* Overrides to ensure bonus side panels stay compact and adapt to content */
 .bonus-side {
     width: auto !important;          /* let content dictate width */
-    min-width: 48px !important;     /* minimal visible size */
-    max-width: 160px !important;    /* avoid overly large panels */
-    max-height: 180px !important;   /* prevent full-height panels */
-    overflow: hidden !important;    /* hide overflow until items appear */
+    min-width: 48px !important;      /* minimal visible size */
+    max-width: 80vw !important;      /* expand to most of screen if needed */
+    max-height: 60vh !important;     /* never occupy entire height */
+    overflow: hidden !important;     /* hide overflow until items appear */
     padding: 6px !important;
     box-sizing: border-box !important;
     opacity: 0;
@@ -2466,7 +2478,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 .bonus-side .bonus-icons {
     display: flex !important;
     flex-direction: row !important;   /* show icons in a row by default */
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;       /* allow multiple rows instead of stretching height */
     align-items: center !important;
     justify-content: center !important;
     gap: 6px !important;
@@ -2480,9 +2492,10 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
 /* When there are many bonuses, allow internal scrolling but keep panel compact */
 .bonus-side.expanded {
-    max-height: 50vh !important;
+    /* no forced max-height; size should wrap content */
     overflow-y: auto !important;
 }
+
 
 /* Visible state: shown only when JS adds .visible */
 .bonus-side.visible {
