@@ -1241,6 +1241,9 @@ body {
 
     .validate-btn {
         background: var(--success);
+    }
+
+.game-actions {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -2123,8 +2126,6 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         transform: translateX(-50%) !important;
         max-width: 90vw !important;
         padding: 0 5px !important;
-    }
-
     }
 
     /* Écran d'accueil : allow local scrolling if content exceeds, keep centered */
