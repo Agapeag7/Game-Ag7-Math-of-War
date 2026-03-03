@@ -2516,11 +2516,12 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 /* Overrides to ensure bonus side panels stay compact and adapt to content */
 .bonus-side {
     width: auto !important;          /* let content dictate width */
-    min-width: 48px !important;      /* minimal visible size */
-    max-width: 95vw !important;      /* expand to most of screen if needed */
-    max-height: 60vh !important;     /* never occupy entire height */
-    overflow: hidden !important;     /* hide overflow until items appear */
-    padding: 6px !important;
+    height: auto !important;         /* let content dictate height */
+    min-width: 0 !important;         /* no forced minimum width */
+    max-width: none !important;
+    max-height: none !important;     /* grow as needed */
+    overflow: visible !important;    /* no scroll, let it expand */
+    padding: 2px !important;
     box-sizing: border-box !important;
     opacity: 0;
     visibility: hidden;
@@ -2531,11 +2532,12 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
 .bonus-side .bonus-icons {
     display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;       /* allow line breaks so all icons visible */
+    flex-direction: column !important; /* stack vertically */
+    flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 4px !important;
+    gap: 2px !important;
+    width: 100% !important;
 }
 
 /* make emoji and counters very small */
@@ -2543,9 +2545,11 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     font-size: 1.2rem !important;
 }
 .bonus-side .bonus-counter {
-    font-size: 0.5rem !important;
-    min-width: 12px !important;
-    height: 12px !important;
+    font-size: 0.45rem !important; /* très petit */
+    min-width: 10px !important;
+    height: 10px !important;
+    line-height: 1 !important;
+    padding: 0 4px !important;
 }
 
 .bonus-side .bonus-icon-item {
@@ -2556,20 +2560,26 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
 /* When there are many bonuses, allow internal scrolling but keep panel compact */
 .bonus-side.expanded {
-    overflow-y: auto !important;
-    overflow-x: auto !important;
+    /* Prefer wrapping and letting the panel grow rather than internal scroll */
+    overflow: visible !important;
+    max-height: none !important;
 }
 
 
 /* Visible state: shown only when JS adds .visible */
 .bonus-side.visible {
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: column !important; /* stack vertically */
+    flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: flex-start !important;
+    gap: 2px !important;
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+    overflow: visible !important;
+    width: auto !important;
+    height: auto !important;
 }
 
 /* Ensure the no-bonus state stays small */
@@ -2582,19 +2592,32 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 /* Mobile-specific tighter limits */
 @media screen and (max-width: 768px) {
     .bonus-side {
-        max-width: 90vw !important;
+        width: auto !important;
+        max-width: none !important;     /* let content determine width */
+        height: auto !important;        /* grow vertically with bonuses */
         max-height: none !important;
-        padding: 4px !important;
+        padding: 2px !important;        /* minimal padding */
     }
     .bonus-side .bonus-icons {
-        gap: 4px !important;
+        gap: 1px !important;             /* tightest spacing */
+    }
+    .bonus-side .bonus-icon-item {
+        padding: 2px 4px !important;     /* minimal padding */
+    }
+    .bonus-side .bonus-counter {
+        min-width: 0 !important;         /* no forced width */
+        height: auto !important;
+        width: auto !important;
+        padding: 0 2px !important;
     }
 }
 
 @media screen and (max-width: 480px) {
     .bonus-side {
-        max-width: 90px !important;
-        max-height: 110px !important;
+        width: 50px !important;        /* narrow column on phone */
+        max-width: 50px !important;
+        height: auto !important;       /* grow vertically as bonuses are added */
+        max-height: none !important;
     }
 }
 
@@ -2628,7 +2651,38 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         padding: 12px !important;
     }
     .question-display {
-        font-size: 3rem !important; /* keep large even on very small screens */
-        padding: 12px !important;
+        font-size: 1.8rem !important; /* reduced to avoid layout shift when text changes */
+        padding: 8px !important;
+    }
+}
+
+/* Mobile override: ensure bonus counters very small and panel is narrow column */
+@media screen and (max-width: 480px) {
+    .bonus-side {
+        width: auto !important;
+        min-width: 0 !important;       /* don't force minimum width */
+        max-width: none !important;
+        height: auto !important;
+        min-height: 0 !important;      /* don't force minimum height */
+        max-height: none !important;
+        padding: 2px !important;       /* minimal padding */
+    }
+    .bonus-side .bonus-icons {
+        flex-direction: column !important;
+        flex-wrap: nowrap !important;
+        gap: 1px !important;           /* tightest gap */
+    }
+    .bonus-side .bonus-icon-item {
+        padding: 2px 4px !important;   /* minimal padding around emoji */
+    }
+    .bonus-side .bonus-counter {
+        font-size: 7px !important;     /* très très petit */
+        min-width: 0 !important;
+        width: auto !important;
+        height: auto !important;
+        padding: 0 2px !important;
+    }
+    .bonus-side .bonus-emoji {
+        font-size: 1rem !important;    /* compact emoji */
     }
 }
