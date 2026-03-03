@@ -925,16 +925,21 @@ body {
 /* Zone de jeu */
 .game-area {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* allow each column to grow while maintaining a reasonable minimum
+       makes team-play areas wider on larger screens */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 20px; /* reduce space below the questions */
 }
 
+
 .team-play-area {
-    padding: 20px;
+    padding: 24px; /* a bit more padding for breathing room */
     border-radius: var(--border-radius);
     background: var(--bg-light);
+    min-width: 240px;
 }
+
 
 .team1-area {
     border-left: 5px solid var(--team1-color);
@@ -995,6 +1000,7 @@ body {
 .bonus-bar {
     position: relative;
     z-index: 100;
+    margin-top: 2px; /* tuck it very close to questions */
 }
 
 .bonus-icons {
@@ -1175,9 +1181,9 @@ body {
 
 .question-display {
     text-align: center;
-    font-size: 2.8rem; /* larger for better readability */
+    font-size: 3.5rem; /* extra large so questions fill the zone */
     font-weight: bold;
-    padding: 20px;
+    padding: 24px;
     background: white;
     border-radius: 10px;
     box-shadow: var(--shadow);
@@ -1197,6 +1203,7 @@ body {
 .controls-area {
     display: grid;
     grid-template-columns: 1fr auto;
+    margin-top: 5px; /* move controls up toward attempts */
     gap: 20px;
     align-items: center;
 }
@@ -1211,13 +1218,32 @@ body {
 }
 
 .num-btn, .action-btn {
-    padding: 15px;
-    font-size: 1.2rem;
+    padding: 12px;
+    font-size: 1rem;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.3s;
+}
+
+/* make numeric pad even smaller on mobile */
+@media screen and (max-width: 768px) {
+    .num-btn, .action-btn {
+        padding: 10px;
+        font-size: 0.9rem;
+        min-height: 36px;
+    }
+    .controls-area {
+        gap: 10px;
+        margin-top: 0;
+    }
+    .game-area {
+        margin-bottom: 10px;
+    }
+    .team-play-area {
+        padding: 16px;
+    }
 }
 
 .num-btn {
@@ -1805,7 +1831,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     }
 
     .question-display {
-        font-size: 1.8rem; /* larger question text on tiny screens */
+        font-size: 3rem; /* preserve large questions even on smallest phones */
         margin-bottom: 12px;
     }
 
@@ -2214,7 +2240,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         padding: 20px;
     }
     .question-display {
-        font-size: 1.8rem;
+        font-size: 3rem; /* ensure big questions even in this section */
         padding: 15px;
     }
 
@@ -2314,7 +2340,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         margin-bottom: 55px;
     }
     .question-display {
-        font-size: 1.8rem; /* bump for mid-size screen rule */
+        font-size: 3rem; /* keep large on very small screens too */
     }
     .team-score {
         font-size: 1.3rem;
@@ -2364,8 +2390,8 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         position: fixed;
         top: auto;
         bottom: 100px; /* Au-dessus du pavé numérique */
-        width: 45%;
-        max-width: 200px;
+        width: auto !important;
+        max-width: 90vw !important;
         padding: 8px 5px;
         background: rgba(0, 0, 0, 0.8);
         border-radius: 20px;
@@ -2429,7 +2455,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
     /* Barre de tentatives mieux intégrée */
     .attempts-compact {
-        padding: 4px 15px;
+        padding: 4px 4px;
         font-size: 1rem;
     }
 }
@@ -2556,8 +2582,8 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 /* Mobile-specific tighter limits */
 @media screen and (max-width: 768px) {
     .bonus-side {
-        max-width: 110px !important;
-        max-height: 120px !important;
+        max-width: 90vw !important;
+        max-height: none !important;
         padding: 4px !important;
     }
     .bonus-side .bonus-icons {
@@ -2569,5 +2595,40 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     .bonus-side {
         max-width: 90px !important;
         max-height: 110px !important;
+    }
+}
+
+/* Strong mobile overrides to ensure question boxes are wide and text is large */
+@media screen and (max-width: 768px) {
+    .game-area {
+        grid-template-columns: 1fr; /* stack and use full width */
+        padding: 8px 0;
+        margin-bottom: 8px;
+    }
+    .team-play-area {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 18px !important;
+    }
+    .question-display {
+        font-size: 3.2rem !important; /* larger on phones/tablets */
+        padding: 18px !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .game-area {
+        grid-template-columns: 1fr; /* stacked full width */
+        padding: 6px 0;
+        margin-bottom: 6px;
+    }
+    .team-play-area {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 12px !important;
+    }
+    .question-display {
+        font-size: 3rem !important; /* keep large even on very small screens */
+        padding: 12px !important;
     }
 }
