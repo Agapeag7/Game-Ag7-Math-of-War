@@ -1695,10 +1695,10 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         font-size: 0.85rem;
     }
 
-    /* Masquer les compteurs de bonus sur mobile */
-    .bonus-counter {
+    /* counters originally hidden on mobile; now shown by later overrides */
+    /* .bonus-counter {
         display: none;
-    }
+    } */
 
     .bonus-icon-item {
         justify-content: center;
@@ -1710,11 +1710,6 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
         display: none;
     }
 
-    .bonus-side {
-        width: 60px; /* Réduire drastiquement la largeur pour ne montrer que les icônes */
-        padding: 8px 4px;
-        top: 100px;
-    }
 
     .bonus-side .bonus-icons {
         gap: 4px; /* Réduire l'espacement */
@@ -1828,8 +1823,8 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     .timer i {
         display: none;
     }
-}
 
+}
 /* Media queries pour très petits écrans (mobiles) */
 @media screen and (max-width: 480px) {
     .game-container {
@@ -2439,14 +2434,13 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
 /* Réorganisation complète pour mobiles (≤ 768px) */
 @media screen and (max-width: 768px) {
-    /* Panneaux de bonus : passer en bas de l'écran, côte à côte */
+    /* Ajustements mineurs sur tablettes - conserver position side, réduire largeur */
     .bonus-side {
         position: fixed;
-        top: auto;
-        bottom: 100px; /* Au-dessus du pavé numérique */
+        bottom: 70px;
         width: auto !important;
-        max-width: 90vw !important;
-        padding: 8px 5px;
+        max-width: 65px !important;
+        padding: 6px 4px;
         background: rgba(0, 0, 0, 0.8);
         border-radius: 20px;
         z-index: 1500;
@@ -2466,6 +2460,8 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     .bonus-side .bonus-icon-item {
         padding: 5px 8px;
         gap: 4px;
+        flex-direction: column;
+        align-items: center;
     }
     .bonus-side .bonus-emoji {
         font-size: 1.3rem;
@@ -2516,10 +2512,10 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
 /* Très petits écrans (≤ 480px) */
 @media screen and (max-width: 480px) {
-    /* Bonus encore plus compacts, empilés verticalement si nécessaire */
+    /* Bonus encore plus compacts, panel size determined by content */
     .bonus-side {
         bottom: 90px;
-        width: 48%;
+        width: auto !important; /* allow auto width */
         padding: 5px 3px;
     }
     .bonus-side::before {
@@ -2588,10 +2584,16 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     display: flex !important;
     flex-direction: column !important; /* stack vertically */
     flex-wrap: nowrap !important;
-    align-items: center !important;
+    align-items: center !important; /* center icons horizontally */
     justify-content: flex-start !important;
     gap: 2px !important;
-    width: 100% !important;
+    width: auto !important;
+}
+.bonus-side .bonus-icon-item {
+    display: flex !important;
+    flex-direction: column !important; /* icon above counter */
+    align-items: center !important;
+    gap: 2px !important;
 }
 
 /* make emoji and counters very small */
@@ -2623,8 +2625,8 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 /* Visible state: shown only when JS adds .visible */
 .bonus-side.visible {
     display: flex !important;
-    flex-direction: column !important; /* stack vertically */
-    flex-wrap: nowrap !important;
+    flex-direction: row !important; /* horizontal layout */
+    flex-wrap: wrap !important;
     align-items: center !important;
     justify-content: flex-start !important;
     gap: 2px !important;
@@ -2668,10 +2670,29 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
 @media screen and (max-width: 480px) {
     .bonus-side {
-        width: 50px !important;        /* narrow column on phone */
-        max-width: 50px !important;
-        height: auto !important;       /* grow vertically as bonuses are added */
+        width: auto !important;        /* allow width to adjust with content */
+        max-width: 90vw !important;    /* but not more than screen */
+        height: auto !important;
         max-height: none !important;
+        padding: 2px !important;
+    }
+}
+
+/* final tweaks for 480px: force row layout, show counters */
+@media screen and (max-width: 480px) {
+    .bonus-side .bonus-icons {
+        flex-direction: row !important; /* horizontal icons */
+        flex-wrap: wrap !important;
+        gap: 2px !important;
+    }
+    .bonus-side .bonus-counter {
+        display: inline-block !important; /* counters visible */
+        font-size: 7px !important;
+        min-width: auto !important;
+        width: auto !important;
+        color: #fff !important;
+        background: rgba(0,0,0,0.3) !important;
+        padding: 0 2px !important;
     }
 }
 
@@ -2710,33 +2731,84 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     }
 }
 
-/* Mobile override: ensure bonus counters very small and panel is narrow column */
+/* Mobile override: ensure bonus counters very small and panel width auto */
 @media screen and (max-width: 480px) {
     .bonus-side {
         width: auto !important;
-        min-width: 0 !important;       /* don't force minimum width */
+        min-width: 0 !important;
         max-width: none !important;
         height: auto !important;
-        min-height: 0 !important;      /* don't force minimum height */
+        min-height: 0 !important;
         max-height: none !important;
-        padding: 2px !important;       /* minimal padding */
+        padding: 2px !important;
     }
     .bonus-side .bonus-icons {
-        flex-direction: column !important;
+        flex-direction: column !important; /* vertical stacking */
         flex-wrap: nowrap !important;
-        gap: 1px !important;           /* tightest gap */
+        align-items: center !important;
+        gap: 1px !important;
     }
     .bonus-side .bonus-icon-item {
-        padding: 2px 4px !important;   /* minimal padding around emoji */
+        padding: 2px 4px !important;
     }
     .bonus-side .bonus-counter {
-        font-size: 7px !important;     /* très très petit */
+        display: inline-block !important;
+        font-size: 9px !important;
         min-width: 0 !important;
         width: auto !important;
         height: auto !important;
         padding: 0 2px !important;
     }
     .bonus-side .bonus-emoji {
-        font-size: 1rem !important;    /* compact emoji */
+        font-size: 1rem !important;
+    }
+}
+
+/* ***** Final strong override for phone bonus panels ***** */
+@media screen and (max-width: 480px) {
+    .bonus-side {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 70px !important;
+        left: auto !important;
+        right: auto !important;
+        width: auto !important;
+        max-width: none !important;
+        height: auto !important;
+        max-height: none !important;
+        padding: 2px !important;
+        background: rgba(0,0,0,0.85) !important;
+    }
+    .bonus-side.left {
+        left: 2px !important;
+    }
+    .bonus-side.right {
+        right: 2px !important;
+    }
+    .bonus-side .bonus-icons {
+        display: flex !important;
+        flex-direction: column !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 2px !important;
+    }
+    .bonus-side .bonus-icon-item {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 2px !important;
+        padding: 2px 4px !important;
+    }
+    .bonus-side .bonus-counter {
+        display: inline-block !important;
+        font-size: 9px !important;
+        color: #fff !important;
+        background: rgba(0,0,0,0.3) !important;
+        padding: 0 2px !important;
+        min-width: 0 !important;
+    }
+    .bonus-side .bonus-emoji {
+        font-size: 1rem !important;
     }
 }

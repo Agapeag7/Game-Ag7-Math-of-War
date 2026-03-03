@@ -2286,6 +2286,19 @@ class UI {
         // Show the side panel only when there are bonuses; expand if many
         const parentPanel = container.closest('.bonus-side');
         if (parentPanel) {
+            // reset any inline sizing to let CSS auto-size correctly
+            parentPanel.style.height = 'auto';
+            parentPanel.style.maxHeight = 'none';
+            parentPanel.style.width = 'auto';
+            // force placement on correct side to avoid centering issues
+            if (team === '1' || team === 1) {
+                parentPanel.style.left = '2px';
+                parentPanel.style.right = '';
+            } else {
+                parentPanel.style.right = '2px';
+                parentPanel.style.left = '';
+            }
+
             parentPanel.classList.add('visible');
             // small screens get expansion only when there are four or more bonuses
             if (activeBonuses.length > 3) parentPanel.classList.add('expanded');
@@ -2469,8 +2482,9 @@ class UI {
 
             .bonus-side .bonus-icon-item {
                 display: flex;
+                flex-direction: column; /* stack emoji over counter */
                 align-items: center;
-                gap: 8px;
+                gap: 4px;
                 padding: 6px 10px;
                 background: rgba(255,255,255,0.1);
                 border-radius: 30px;
