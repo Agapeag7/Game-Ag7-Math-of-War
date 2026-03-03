@@ -120,6 +120,15 @@ body {
     position: relative;
 }
 
+@media screen and (max-width: 480px) {
+    .game-container {
+        max-width: 100% !important;
+        width: 100vw !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+}
+
 /* Écrans */
 .screen {
     display: none;
@@ -487,6 +496,43 @@ body {
     margin-bottom: 10px;
     font-weight: bold;
     color: var(--text-dark);
+}
+
+@media screen and (max-width: 480px) {
+    .setting-group label {
+        font-weight: bold !important;
+        font-size: 1rem !important;
+    }
+    
+    .card-title {
+        font-weight: normal !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .card-desc {
+        font-weight: normal !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .game-title {
+        font-weight: normal !important;
+        font-size: 1.4rem !important;
+    }
+    
+    .game-subtitle {
+        font-weight: normal !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .home-footer p {
+        font-weight: normal !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .home-stats {
+        font-weight: normal !important;
+        font-size: 0.65rem !important;
+    }
 }
 
 .setting-select {
@@ -938,6 +984,14 @@ body {
     border-radius: var(--border-radius);
     background: var(--bg-light);
     min-width: 240px;
+}
+
+@media screen and (max-width: 480px) {
+    .team-play-area {
+        min-width: 0 !important;
+        width: 100% !important;
+        padding: 12px !important;
+    }
 }
 
 
