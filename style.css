@@ -1054,7 +1054,8 @@ body {
 .bonus-bar {
     position: relative;
     z-index: 100;
-    margin-top: 2px; /* tuck it very close to questions */
+    margin-top: 0; /* no extra gap */
+    margin-bottom: 0;
 }
 
 .bonus-icons {
@@ -1721,7 +1722,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 
     .bonus-bar {
         max-width: 200px; /* Réduire encore plus sur mobile */
-        margin: 8px auto; /* Centrer */
+        margin: 2px auto !important; /* minimal vertical gap */
         padding: 6px 10px;
     }
 
@@ -2437,7 +2438,8 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     /* Ajustements mineurs sur tablettes - conserver position side, réduire largeur */
     .bonus-side {
         position: fixed;
-        bottom: 70px;
+        bottom: auto !important;
+        top: auto !important;
         width: auto !important;
         max-width: 65px !important;
         padding: 6px 4px;
@@ -2718,7 +2720,7 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
     .game-area {
         grid-template-columns: 1fr; /* stacked full width */
         padding: 6px 0;
-        margin-bottom: 6px;
+        margin-bottom: 2px !important; /* really tighten under questions */
     }
     .team-play-area {
         width: 100% !important;
@@ -2768,8 +2770,8 @@ MEDIA QUERIES POUR MINI TABLETTES ET PHONES
 @media screen and (max-width: 480px) {
     .bonus-side {
         position: fixed !important;
-        top: auto !important;
-        bottom: 70px !important;
+        top: 140px !important; /* fixed vertical offset near questions */
+        bottom: auto !important;
         left: auto !important;
         right: auto !important;
         width: auto !important;

@@ -2290,7 +2290,16 @@ class UI {
             parentPanel.style.height = 'auto';
             parentPanel.style.maxHeight = 'none';
             parentPanel.style.width = 'auto';
-            // force placement on correct side to avoid centering issues
+            parentPanel.style.bottom = '';
+            parentPanel.style.top = '';
+            // position to the vertical level of the team's question box
+            const questionBox = document.getElementById(team === '1' ? 'team1-operation' : 'team2-operation');
+            if (questionBox) {
+                const rect = questionBox.getBoundingClientRect();
+                // for fixed positioning use viewport coordinates
+                parentPanel.style.top = `${rect.top}px`;
+            }
+            // force placement on correct horizontal side
             if (team === '1' || team === 1) {
                 parentPanel.style.left = '2px';
                 parentPanel.style.right = '';
